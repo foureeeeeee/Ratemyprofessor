@@ -1,0 +1,5 @@
+{
+  "name": "Rate My Professor",
+  "description": "A web-based Management Information System (MIS) enabling students to evaluate and review lecturers, with data-driven analytics for academic decision-making.",
+  "requestFramePermissions": []
+}
