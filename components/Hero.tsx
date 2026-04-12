@@ -48,6 +48,9 @@ export const Hero: React.FC<Props> = ({ professors = [], courses = [] }) => {
         />
       </div>
       
+      {/* Glass blur overlay to ensure main content focus */}
+      <div className="absolute inset-0 z-0 backdrop-blur-[2px] bg-terminal-black/40 pointer-events-none"></div>
+      
       <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
         {/* ASCII Art Banner */}
         <pre className="text-[0.5rem] md:text-xs leading-none text-terminal-light opacity-80 mb-8 hidden sm:block select-none">
