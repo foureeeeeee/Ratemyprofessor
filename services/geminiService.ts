@@ -5,7 +5,7 @@ import { Review } from "../types";
 // Note: In a production environment, never expose keys on the client side.
 // This is for demonstration purposes as requested by the persona guidance.
 // We check import.meta.env for Vercel/Netlify deployments, and process.env for AI Studio.
-const apiKey = import.meta.env?.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : '') || ''; 
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : '') || ''; 
 
 const ai = new GoogleGenAI({ apiKey });
 
