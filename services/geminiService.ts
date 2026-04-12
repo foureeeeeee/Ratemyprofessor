@@ -4,12 +4,14 @@ import { Review } from "../types";
 // Initialize Gemini
 // Note: In a production environment, never expose keys on the client side.
 // This is for demonstration purposes as requested by the persona guidance.
-const apiKey = process.env.API_KEY || ''; 
+// We check import.meta.env for Vercel/Netlify deployments, and process.env for AI Studio.
+const apiKey = import.meta.env?.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : '') || ''; 
+
 const ai = new GoogleGenAI({ apiKey });
 
 export const summarizeReviews = async (professorName: string, reviews: Review[]): Promise<string> => {
   if (!apiKey) {
-    return "API Key not configured. Unable to generate summary.";
+    return "API Key not configured. Please set VITE_GEMINI_API_KEY in your hosting provider.";
   }
 
   if (reviews.length === 0) {
@@ -40,7 +42,7 @@ export const summarizeReviews = async (professorName: string, reviews: Review[])
 
 export const summarizeCourseReviews = async (courseName: string, courseCode: string, reviews: Review[]): Promise<string> => {
   if (!apiKey) {
-    return "API Key not configured. Unable to generate summary.";
+    return "API Key not configured. Please set VITE_GEMINI_API_KEY in your hosting provider.";
   }
 
   if (reviews.length === 0) {
