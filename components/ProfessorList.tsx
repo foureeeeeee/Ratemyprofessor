@@ -66,7 +66,7 @@ export const ProfessorList: React.FC<Props> = ({ professors, reviews, onAddProfe
   const handleAddSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const professor: Professor = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       name: newProf.name,
       department: newProf.department,
       title: newProf.title,

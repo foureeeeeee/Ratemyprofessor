@@ -53,7 +53,7 @@ export const ReviewForm: React.FC<Props> = ({ professorId, courseCode = '', avai
     );
 
     const newReview: Review = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       professorId: finalProfessorId,
       studentName: currentUser.name, // Enforce verified name
       rating: overallRating,

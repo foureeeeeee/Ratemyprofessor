@@ -10,11 +10,11 @@ import { ProfessorDetails } from './components/ProfessorDetails';
 import { Dashboard } from './components/Dashboard';
 import { AdminLogin } from './components/AdminLogin';
 import { AdminDashboard } from './components/AdminDashboard';
-// import { ParticlesBackground } from './components/ParticlesBackground'; // Removed for academic look
 import { StudentLoginModal } from './components/StudentLoginModal';
 import { MOCK_PROFESSORS, MOCK_REVIEWS, MOCK_COURSES } from './constants';
 import { Professor, Review, Course, User, Report } from './types';
 import { Loader2, BookOpenCheck } from 'lucide-react';
+import { supabase } from './services/supabase';
 
 export default function App() {
   // Centralized state to simulate a database
@@ -27,15 +27,90 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
-  // Simulate fetching data from an API
+  // Fetch data from Supabase
   useEffect(() => {
     const fetchData = async () => {
-      // Simulate network latency
-      await new Promise(resolve => setTimeout(resolve, 800));
-      setProfessors(MOCK_PROFESSORS);
-      setReviews(MOCK_REVIEWS);
-      setCourses(MOCK_COURSES);
-      setIsLoading(false);
+      try {
+        const [professorsRes, coursesRes, reviewsRes, reportsRes] = await Promise.all([
+          supabase.from('professors').select('*'),
+          supabase.from('courses').select('*'),
+          supabase.from('reviews').select('*'),
+          supabase.from('reports').select('*')
+        ]);
+
+        if (professorsRes.error) throw professorsRes.error;
+        if (coursesRes.error) throw coursesRes.error;
+        if (reviewsRes.error) throw reviewsRes.error;
+        if (reportsRes.error) throw reportsRes.error;
+
+        // Map snake_case to camelCase
+        const mappedProfessors = professorsRes.data.map(p => ({
+          id: p.id,
+          name: p.name,
+          department: p.department,
+          title: p.title,
+          image: p.image,
+          averageRating: p.average_rating,
+          reviewCount: p.review_count
+        }));
+
+        const mappedCourses = coursesRes.data.map(c => ({
+          id: c.id,
+          code: c.code,
+          name: c.name,
+          department: c.department,
+          description: c.description,
+          professorIds: c.professor_ids || []
+        }));
+
+        const mappedReviews = reviewsRes.data.map(r => ({
+          id: r.id,
+          professorId: r.professor_id,
+          studentName: r.student_name,
+          rating: r.rating,
+          difficulty: r.difficulty,
+          tags: r.tags || [],
+          comment: r.comment,
+          courseCode: r.course_code,
+          date: r.date,
+          clarity: r.clarity,
+          fairness: r.fairness,
+          communication: r.communication,
+          expertise: r.expertise,
+          approachability: r.approachability,
+          forCredit: r.for_credit,
+          attendance: r.attendance,
+          wouldTakeAgain: r.would_take_again,
+          grade: r.grade,
+          textbookUsed: r.textbook_used,
+          verified: r.verified
+        }));
+
+        const mappedReports = reportsRes.data.map(r => ({
+          id: r.id,
+          targetId: r.target_id,
+          targetType: r.target_type,
+          reason: r.reason,
+          details: r.details,
+          status: r.status,
+          timestamp: r.timestamp,
+          reporterEmail: r.reporter_email
+        }));
+
+        // Fallback to mock data if Supabase tables are empty (for initial setup)
+        setProfessors(mappedProfessors.length > 0 ? mappedProfessors : MOCK_PROFESSORS);
+        setCourses(mappedCourses.length > 0 ? mappedCourses : MOCK_COURSES);
+        setReviews(mappedReviews.length > 0 ? mappedReviews : MOCK_REVIEWS);
+        setReports(mappedReports);
+      } catch (error) {
+        console.error("Error fetching from Supabase:", error);
+        // Fallback to mock data on error
+        setProfessors(MOCK_PROFESSORS);
+        setCourses(MOCK_COURSES);
+        setReviews(MOCK_REVIEWS);
+      } finally {
+        setIsLoading(false);
+      }
     };
     fetchData();
   }, []);
@@ -71,50 +146,153 @@ export default function App() {
 
   // --- CRUD Handlers ---
 
-  const handleAddReview = (newReview: Review) => {
+  const handleAddReview = async (newReview: Review) => {
     setReviews(prev => [newReview, ...prev]);
+    try {
+      await supabase.from('reviews').insert({
+        id: newReview.id,
+        professor_id: newReview.professorId,
+        student_name: newReview.studentName,
+        rating: newReview.rating,
+        difficulty: newReview.difficulty,
+        tags: newReview.tags,
+        comment: newReview.comment,
+        course_code: newReview.courseCode,
+        date: newReview.date,
+        clarity: newReview.clarity,
+        fairness: newReview.fairness,
+        communication: newReview.communication,
+        expertise: newReview.expertise,
+        approachability: newReview.approachability,
+        for_credit: newReview.forCredit,
+        attendance: newReview.attendance,
+        would_take_again: newReview.wouldTakeAgain,
+        grade: newReview.grade,
+        textbook_used: newReview.textbookUsed,
+        verified: newReview.verified
+      });
+    } catch (error) {
+      console.error("Error adding review:", error);
+    }
   };
 
-  const handleDeleteReview = (id: string) => {
+  const handleDeleteReview = async (id: string) => {
     setReviews(prev => prev.filter(r => r.id !== id));
+    try {
+      await supabase.from('reviews').delete().eq('id', id);
+    } catch (error) {
+      console.error("Error deleting review:", error);
+    }
   };
 
-  const handleAddProfessor = (newProfessor: Professor) => {
+  const handleAddProfessor = async (newProfessor: Professor) => {
     setProfessors(prev => [newProfessor, ...prev]);
+    try {
+      await supabase.from('professors').insert({
+        id: newProfessor.id,
+        name: newProfessor.name,
+        department: newProfessor.department,
+        title: newProfessor.title,
+        image: newProfessor.image,
+        average_rating: newProfessor.averageRating,
+        review_count: newProfessor.reviewCount
+      });
+    } catch (error) {
+      console.error("Error adding professor:", error);
+    }
   };
 
-  const handleUpdateProfessor = (updatedProfessor: Professor) => {
+  const handleUpdateProfessor = async (updatedProfessor: Professor) => {
     setProfessors(prev => prev.map(p => p.id === updatedProfessor.id ? updatedProfessor : p));
+    try {
+      await supabase.from('professors').update({
+        name: updatedProfessor.name,
+        department: updatedProfessor.department,
+        title: updatedProfessor.title,
+        image: updatedProfessor.image,
+        average_rating: updatedProfessor.averageRating,
+        review_count: updatedProfessor.reviewCount
+      }).eq('id', updatedProfessor.id);
+    } catch (error) {
+      console.error("Error updating professor:", error);
+    }
   };
 
-  const handleDeleteProfessor = (id: string) => {
+  const handleDeleteProfessor = async (id: string) => {
     setProfessors(prev => prev.filter(p => p.id !== id));
+    try {
+      await supabase.from('professors').delete().eq('id', id);
+    } catch (error) {
+      console.error("Error deleting professor:", error);
+    }
   };
 
-  const handleAddCourse = (newCourse: Course) => {
+  const handleAddCourse = async (newCourse: Course) => {
     setCourses(prev => [newCourse, ...prev]);
+    try {
+      await supabase.from('courses').insert({
+        id: newCourse.id,
+        code: newCourse.code,
+        name: newCourse.name,
+        department: newCourse.department,
+        description: newCourse.description,
+        professor_ids: newCourse.professorIds
+      });
+    } catch (error) {
+      console.error("Error adding course:", error);
+    }
   };
 
-  const handleUpdateCourse = (updatedCourse: Course) => {
+  const handleUpdateCourse = async (updatedCourse: Course) => {
     setCourses(prev => prev.map(c => c.id === updatedCourse.id ? updatedCourse : c));
+    try {
+      await supabase.from('courses').update({
+        code: updatedCourse.code,
+        name: updatedCourse.name,
+        department: updatedCourse.department,
+        description: updatedCourse.description,
+        professor_ids: updatedCourse.professorIds
+      }).eq('id', updatedCourse.id);
+    } catch (error) {
+      console.error("Error updating course:", error);
+    }
   };
 
-  const handleDeleteCourse = (id: string) => {
+  const handleDeleteCourse = async (id: string) => {
     setCourses(prev => prev.filter(c => c.id !== id));
+    try {
+      await supabase.from('courses').delete().eq('id', id);
+    } catch (error) {
+      console.error("Error deleting course:", error);
+    }
   };
 
   // --- Reporting Handlers ---
-  const handleReportContent = (report: Omit<Report, 'id' | 'status' | 'timestamp'>) => {
+  const handleReportContent = async (report: Omit<Report, 'id' | 'status' | 'timestamp'>) => {
     const newReport: Report = {
       ...report,
-      id: Date.now().toString(),
+      id: crypto.randomUUID(), // Use UUID for Supabase
       status: 'pending',
       timestamp: new Date().toISOString()
     };
     setReports(prev => [newReport, ...prev]);
+    try {
+      await supabase.from('reports').insert({
+        id: newReport.id,
+        target_id: newReport.targetId,
+        target_type: newReport.targetType,
+        reason: newReport.reason,
+        details: newReport.details,
+        status: newReport.status,
+        timestamp: newReport.timestamp,
+        reporter_email: newReport.reporterEmail
+      });
+    } catch (error) {
+      console.error("Error adding report:", error);
+    }
   };
 
-  const handleResolveReport = (reportId: string, action: 'dismiss' | 'delete', adminMessage?: string) => {
+  const handleResolveReport = async (reportId: string, action: 'dismiss' | 'delete', adminMessage?: string) => {
     const report = reports.find(r => r.id === reportId);
     
     // Notify User
@@ -135,12 +313,19 @@ export default function App() {
       alert(emailBody);
     }
 
+    const newStatus = action === 'dismiss' ? 'dismissed' : 'resolved';
     setReports(prev => prev.map(r => {
       if (r.id === reportId) {
-        return { ...r, status: action === 'dismiss' ? 'dismissed' : 'resolved' };
+        return { ...r, status: newStatus };
       }
       return r;
     }));
+
+    try {
+      await supabase.from('reports').update({ status: newStatus }).eq('id', reportId);
+    } catch (error) {
+      console.error("Error updating report:", error);
+    }
   };
 
   // --- Auth Handlers ---

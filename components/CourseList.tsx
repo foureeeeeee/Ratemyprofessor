@@ -67,7 +67,7 @@ export const CourseList: React.FC<Props> = ({ courses, professors, reviews, onAd
     e.preventDefault();
     if (!onAddCourse) return;
     const course: Course = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       code: newCourse.code,
       name: newCourse.name,
       department: newCourse.department,

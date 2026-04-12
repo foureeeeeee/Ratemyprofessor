@@ -303,7 +303,7 @@ export const AdminDashboard: React.FC<Props> = ({
     
     if (activeTab === 'professors') {
       const prof: Professor = {
-        id: editingItem ? editingItem.id : Date.now().toString(),
+        id: editingItem ? editingItem.id : crypto.randomUUID(),
         name: formData.get('name') as string,
         title: formData.get('title') as string,
         department: formData.get('department') as string,
@@ -315,7 +315,7 @@ export const AdminDashboard: React.FC<Props> = ({
     } 
     else if (activeTab === 'courses') {
         const course: Course = {
-            id: editingItem ? editingItem.id : Date.now().toString(),
+            id: editingItem ? editingItem.id : crypto.randomUUID(),
             code: formData.get('code') as string,
             name: formData.get('name') as string,
             department: formData.get('department') as string,
