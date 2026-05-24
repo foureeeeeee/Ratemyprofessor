@@ -6,9 +6,10 @@ import { User } from '../types';
 interface Props {
   currentUser?: User | null;
   onTriggerLogin: () => void;
+  onLogout?: () => void;
 }
 
-export const Navbar: React.FC<Props> = ({ currentUser, onTriggerLogin }) => {
+export const Navbar: React.FC<Props> = ({ currentUser, onTriggerLogin, onLogout }) => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -47,10 +48,18 @@ export const Navbar: React.FC<Props> = ({ currentUser, onTriggerLogin }) => {
             </div>
 
             {currentUser ? (
-              <div className="flex items-center gap-2 border border-terminal-accent px-3 py-1 text-terminal-accent text-xs font-bold uppercase">
-                <div className="w-2 h-2 bg-terminal-accent rounded-none animate-pulse"></div>
-                <span>{currentUser.name}</span>
-                {currentUser.isVerified && <Shield className="w-3 h-3" />}
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 border border-terminal-accent px-3 py-1 text-terminal-accent text-xs font-bold uppercase">
+                  <div className="w-2 h-2 bg-terminal-accent rounded-none animate-pulse"></div>
+                  <span>{currentUser.name}</span>
+                  {currentUser.isVerified && <Shield className="w-3 h-3" />}
+                </div>
+                <button 
+                  onClick={onLogout}
+                  className="bg-terminal-gray text-terminal-light px-4 py-2 text-xs font-bold uppercase hover:bg-terminal-accent hover:text-terminal-black transition-colors"
+                >
+                  [ LOGOUT ]
+                </button>
               </div>
             ) : (
               <button 
@@ -85,8 +94,19 @@ export const Navbar: React.FC<Props> = ({ currentUser, onTriggerLogin }) => {
             
             <div className="pt-4 mt-4 border-t border-terminal-gray">
               {currentUser ? (
-                <div className="px-3 py-2 text-terminal-accent font-bold uppercase">
-                  USER: {currentUser.name}
+                <div className="space-y-2">
+                  <div className="px-3 py-2 text-terminal-accent font-bold uppercase">
+                    USER: {currentUser.name}
+                  </div>
+                  <button 
+                    onClick={() => {
+                      if (onLogout) onLogout();
+                      closeMobileMenu();
+                    }}
+                    className="w-full text-left px-3 py-2 text-base font-medium text-red-500 hover:bg-terminal-gray hover:text-red-400 uppercase"
+                  >
+                    [ LOGOUT ]
+                  </button>
                 </div>
               ) : (
                 <button 

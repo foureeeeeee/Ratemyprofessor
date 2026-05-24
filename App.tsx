@@ -366,6 +366,15 @@ export default function App() {
     setIsLoginModalOpen(true);
   };
 
+  const handleStudentLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      setCurrentUser(null);
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 text-slate-800 font-sans">
@@ -382,7 +391,11 @@ export default function App() {
     <HashRouter>
       <div className="min-h-screen flex flex-col font-sans text-slate-800 bg-slate-50 relative">
         
-        <Navbar currentUser={currentUser} onTriggerLogin={handleRequireLogin} />
+        <Navbar 
+          currentUser={currentUser} 
+          onTriggerLogin={handleRequireLogin} 
+          onLogout={handleStudentLogout}
+        />
         
         <main className="flex-grow relative z-10">
           <Routes>
