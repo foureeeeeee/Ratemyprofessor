@@ -316,18 +316,20 @@ export default function App() {
     if (report && report.reporterEmail) {
       const resolution = action === 'dismiss' ? 'Approved (Report Dismissed)' : 'Rejected (Content Removed)';
       
-      let emailBody = `[SYSTEM NOTIFICATION]\n\nTo: ${report.reporterEmail}\nSubject: Update on your report regarding ${report.targetType}\n\n`;
-      emailBody += `Your report has been reviewed by our administration team.\n\n`;
-      emailBody += `Resolution: ${resolution}\n`;
+      const subject = encodeURIComponent(`Update on your report regarding ${report.targetType}`);
+      let bodyText = `Your report has been reviewed by our administration team.\n\n`;
+      bodyText += `Resolution: ${resolution}\n`;
       
       if (adminMessage) {
-        emailBody += `\nMessage from Admin:\n"${adminMessage}"\n`;
+        bodyText += `\nMessage from Admin:\n"${adminMessage}"\n`;
       }
       
-      emailBody += `\nThank you for helping keep our community safe and accurate.`;
+      bodyText += `\nThank you for helping keep our community safe and accurate.`;
       
-      // Simulate Email/Notification
-      alert(emailBody);
+      const body = encodeURIComponent(bodyText);
+      
+      // Open default email client with pre-filled content
+      window.location.href = `mailto:${report.reporterEmail}?subject=${subject}&body=${body}`;
     }
 
     const newStatus = action === 'dismiss' ? 'dismissed' : 'resolved';
