@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, ShieldCheck, X, ArrowRight, Loader2 } from 'lucide-react';
+import { supabase } from '../services/supabase'; // Import your configured Supabase client
 
 interface Props {
   onClose: () => void;
@@ -15,20 +16,38 @@ export const StudentLoginModal: React.FC<Props> = ({ onClose, onLogin }) => {
     e.preventDefault();
     setError('');
     
-    // Basic domain check
-    if (!email.endsWith('@siswa.ukm.edu.my')) {
-      setError('Please use your UKM student email (@siswa.ukm.edu.my)');
+    // 1. Strict Regex for UKM Matriculation Number Format
+    // Matches: 1 letter (A/P) + 5 to 7 digits + @siswa.ukm.edu.my
+    const ukmEmailRegex = /^[a-zA-Z]\d{5,7}@siswa\.ukm\.edu\.my$/i;
+
+    if (!ukmEmailRegex.test(email)) {
+      setError('Invalid format. Use your matric number (e.g., A123456@siswa.ukm.edu.my)');
       return;
     }
 
     setIsVerifying(true);
     
-    // Simulate verification delay
-    setTimeout(() => {
+    try {
+      // 2. Send a Magic Link using Supabase
+      const { error } = await supabase.auth.signInWithOtp({
+        email: email,
+        options: {
+          // This will append a 'verified=true' parameter when they click the link in their email
+          emailRedirectTo: window.location.origin + '?verified=true', 
+        }
+      });
+
+      if (error) throw error;
+
+      // Change UI state to tell the user to check their email
+      alert("Verification link sent! Please check your Siswa email inbox.");
+      onClose(); 
+
+    } catch (err: any) {
+      setError(err.message || 'Failed to send verification email.');
+    } finally {
       setIsVerifying(false);
-      onLogin(email);
-      onClose();
-    }, 1500);
+    }
   };
 
   return (

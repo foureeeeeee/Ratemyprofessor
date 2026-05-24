@@ -113,6 +113,23 @@ export default function App() {
       }
     };
     fetchData();
+
+    // Set up Supabase Auth Listener for Magic Link Logins
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user?.email) {
+        handleStudentLogin(session.user.email);
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user?.email) {
+        handleStudentLogin(session.user.email);
+      } else {
+        setCurrentUser(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   // Recalculate professor ratings when reviews change
