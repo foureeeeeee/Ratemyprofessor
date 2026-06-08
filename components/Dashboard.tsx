@@ -95,21 +95,69 @@ export const Dashboard: React.FC<Props> = ({ professors, reviews }) => {
     return null;
   };
 
+  const summaryInsight = useMemo(() => {
+    if (reviews.length === 0) {
+      return "Insufficient data to generate meaningful insights at this time. Participate by dropping a review.";
+    }
+
+    const avgRating = parseFloat(globalStats.avgRating);
+    const avgDiff = parseFloat(globalStats.avgDifficulty);
+    const retakeRate = parseFloat(globalStats.wouldTakeAgain);
+
+    let ratingText = "";
+    if (avgRating >= 4.5) ratingText = "exceptionally positive";
+    else if (avgRating >= 3.8) ratingText = "highly positive";
+    else if (avgRating >= 3.0) ratingText = "generally mixed";
+    else ratingText = "often critical";
+
+    let diffText = "";
+    if (avgDiff >= 4.0) diffText = "highly challenging";
+    else if (avgDiff >= 3.0) diffText = "moderately rigorous";
+    else diffText = "relatively accessible";
+
+    let retakeText = "";
+    if (retakeRate >= 75) retakeText = "indicating strong student satisfaction and retention";
+    else if (retakeRate >= 50) retakeText = "showing moderate willingness to repeat courses";
+    else retakeText = "reflecting lower overall course re-enrollment enthusiasm";
+
+    return (
+      <>
+        The aggregate data indicates a system-wide quality rating of <span className="font-bold text-ukm-blue">{globalStats.avgRating}/5</span> 
+        {" "}and an academic rigor score of <span className="font-bold text-rose-600">{globalStats.avgDifficulty}/5</span> based on {reviews.length} total entries. 
+        {" "}With <span className="font-bold text-slate-900">{globalStats.wouldTakeAgain}%</span> of students willing to retake their courses, 
+        the academic environment is observed to be <span className="font-medium text-slate-900">{diffText}</span> with <span className="font-medium text-slate-900">{ratingText}</span> feedback, <span className="italic text-slate-600">{retakeText}</span>.
+      </>
+    );
+  }, [globalStats, reviews.length]);
+
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8 lg:p-12 text-slate-800">
       <div className="max-w-7xl mx-auto">
-        <div className="border-b border-slate-200 mb-10 pb-6">
+        <div className="border-b border-slate-200 mb-8 pb-6">
           <h1 className="text-4xl md:text-5xl font-bold font-serif text-slate-900 tracking-tight">System Analytics</h1>
           <p className="text-slate-500 mt-2 text-lg">Real-time academic data visualization.</p>
+        </div>
+
+        {/* Dynamic Insight Banner */}
+        <div className="bg-blue-50/80 backdrop-blur-sm border border-blue-100 rounded-2xl p-6 mb-10 flex flex-col md:flex-row gap-4 items-start md:items-center shadow-sm">
+          <div className="p-3 bg-blue-100 text-ukm-blue rounded-xl flex-shrink-0">
+            <TrendingUp className="w-6 h-6" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-slate-900 mb-1">Executive Summary</h3>
+            <p className="text-slate-700 leading-relaxed text-sm md:text-base">
+              {summaryInsight}
+            </p>
+          </div>
         </div>
 
         {/* KPI Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           {[
-            { label: 'Total Reviews', val: reviews.length, icon: Users, color: 'text-ukm-blue' },
-            { label: 'Avg Quality', val: globalStats.avgRating, icon: Award, color: 'text-amber-500' },
-            { label: 'Avg Difficulty', val: globalStats.avgDifficulty, icon: AlertTriangle, color: 'text-rose-500' },
-            { label: 'Retake Rate', val: `${globalStats.wouldTakeAgain}%`, icon: CheckCircle, color: 'text-emerald-500' }
+            { label: 'Total Reviews', val: reviews.length, icon: Users, color: 'text-ukm-blue', desc: 'Total user feedback entries' },
+            { label: 'Avg Quality', val: globalStats.avgRating, icon: Award, color: 'text-amber-500', desc: 'Overall satisfaction (1-5)' },
+            { label: 'Avg Difficulty', val: globalStats.avgDifficulty, icon: AlertTriangle, color: 'text-rose-500', desc: 'Perceived academic rigor (1-5)' },
+            { label: 'Retake Rate', val: `${globalStats.wouldTakeAgain}%`, icon: CheckCircle, color: 'text-emerald-500', desc: 'Recommend to other students' }
           ].map((kpi) => (
             <div key={kpi.label} className="bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-2xl p-6 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-blue-200 hover:bg-white/95 transition-all">
               <div className="flex justify-between items-start mb-4">
@@ -118,7 +166,8 @@ export const Dashboard: React.FC<Props> = ({ professors, reviews }) => {
                   <kpi.icon className={`w-5 h-5 ${kpi.color}`} />
                 </div>
               </div>
-              <div className="text-4xl font-bold text-slate-900">{kpi.val}</div>
+              <div className="text-4xl font-bold text-slate-900 mb-2">{kpi.val}</div>
+              <p className="text-xs text-slate-400 font-medium">{kpi.desc}</p>
               <div className="absolute bottom-0 left-0 w-full h-1 bg-slate-100 group-hover:bg-ukm-blue transition-colors"></div>
             </div>
           ))}
@@ -127,7 +176,8 @@ export const Dashboard: React.FC<Props> = ({ professors, reviews }) => {
         {/* Charts Row 1 */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
           <div className="lg:col-span-2 bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all">
-            <h3 className="text-xl font-bold font-serif text-slate-900 mb-6 pb-2 border-b border-slate-100">Performance By Department</h3>
+            <h3 className="text-xl font-bold font-serif text-slate-900 mb-2">Performance By Department</h3>
+            <p className="text-sm text-slate-500 pb-4 mb-4 border-b border-slate-100">Compare aggregate instructional quality against course difficulty across different academic faculties.</p>
             <div className="h-72 w-full">
               <ResponsiveContainer>
                 <BarChart data={departmentStats} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -144,7 +194,8 @@ export const Dashboard: React.FC<Props> = ({ professors, reviews }) => {
           </div>
 
           <div className="bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all">
-            <h3 className="text-xl font-bold font-serif text-slate-900 mb-6 pb-2 border-b border-slate-100">Grade Distribution</h3>
+            <h3 className="text-xl font-bold font-serif text-slate-900 mb-2">Grade Distribution</h3>
+            <p className="text-sm text-slate-500 pb-4 mb-4 border-b border-slate-100">Frequency of self-reported academic outcomes to analyze overall grading curves.</p>
             <div className="h-72 w-full">
               <ResponsiveContainer>
                 <AreaChart data={gradeData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -162,7 +213,8 @@ export const Dashboard: React.FC<Props> = ({ professors, reviews }) => {
         {/* Row 2 */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
            <div className="bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all">
-              <h3 className="text-xl font-bold font-serif text-slate-900 mb-6 pb-2 border-b border-slate-100">Attendance Policies</h3>
+              <h3 className="text-xl font-bold font-serif text-slate-900 mb-2">Attendance Policies</h3>
+              <p className="text-sm text-slate-500 pb-4 mb-4 border-b border-slate-100">Overview of mandatory vs optional attendance requirements across classes.</p>
               <div className="h-64 w-full">
                 <ResponsiveContainer>
                   <PieChart>
@@ -177,7 +229,8 @@ export const Dashboard: React.FC<Props> = ({ professors, reviews }) => {
            </div>
 
            <div className="bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all">
-              <h3 className="text-xl font-bold font-serif text-slate-900 mb-6 pb-2 border-b border-slate-100">Top Rated Faculty</h3>
+              <h3 className="text-xl font-bold font-serif text-slate-900 mb-2">Top Rated Faculty</h3>
+              <p className="text-sm text-slate-500 pb-4 mb-4 border-b border-slate-100">Highest performing professors in the system based on overall student ratings.</p>
               <div className="space-y-4">
                 {topProfessors.map((p, i) => (
                   <div key={p.id} className="flex justify-between items-center group">
@@ -196,7 +249,8 @@ export const Dashboard: React.FC<Props> = ({ professors, reviews }) => {
            </div>
 
            <div className="bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all">
-              <h3 className="text-xl font-bold font-serif text-slate-900 mb-6 pb-2 border-b border-slate-100">Most Difficult Courses</h3>
+              <h3 className="text-xl font-bold font-serif text-slate-900 mb-2">Most Difficult Courses</h3>
+              <p className="text-sm text-slate-500 pb-4 mb-4 border-b border-slate-100">Courses with the highest reported academic rigor demanding more effort.</p>
               <div className="space-y-4">
                 {difficultCourses.map((c) => (
                   <div key={c.code} className="flex justify-between items-center group">
