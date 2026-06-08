@@ -1,13 +1,15 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { Professor, Review, User } from '../types';
+import { useParams, Link, useLocation } from 'react-router-dom';
+import { Professor, Review, User, Course } from '../types';
 import { Star, MessageSquare, BookOpen, ThumbsUp, ArrowLeft, Wand2, Loader2, ShieldCheck, Flag } from 'lucide-react';
 import { ReviewForm } from './ReviewForm';
 import { summarizeReviews } from '../services/geminiService';
 import { ReportModal } from './ReportModal';
+import { useReviewAuthorizationByName } from '../hooks/useReviewAuthorization';
 
 interface Props {
   professors: Professor[];
+  courses: Course[];
   reviews: Review[];
   onAddReview: (review: Review) => void;
   currentUser?: User | null;
@@ -15,16 +17,35 @@ interface Props {
   onReport: (report: any) => void;
 }
 
-export const ProfessorDetails: React.FC<Props> = ({ professors, reviews, onAddReview, currentUser, onRequireLogin, onReport }) => {
+export const ProfessorDetails: React.FC<Props> = ({ professors, courses, reviews, onAddReview, currentUser, onRequireLogin, onReport }) => {
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
   const professor = professors.find(p => p.id === id);
   const [showForm, setShowForm] = useState(false);
   const [aiSummary, setAiSummary] = useState<string | null>(null);
   const [loadingAi, setLoadingAi] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Parse query params
+  const searchParams = new URLSearchParams(location.search);
+  const action = searchParams.get('action');
+  const courseFromQuery = searchParams.get('course');
   
   // Reporting State
   const [reportConfig, setReportConfig] = useState<{id: string, type: 'review'|'professor', name?: string} | null>(null);
+
+  const { isAuthorized, validCourseCodes, isLoading: isAuthLoading } = useReviewAuthorizationByName(
+    currentUser?.email,
+    professor?.name || '',
+    courses,
+    professors
+  );
+
+  useEffect(() => {
+    if (action === 'review' && isAuthorized && !isAuthLoading && currentUser) {
+      setShowForm(true);
+    }
+  }, [action, isAuthorized, isAuthLoading, currentUser]);
 
   // Simulate fetching details for this professor
   useEffect(() => {
@@ -174,14 +195,52 @@ export const ProfessorDetails: React.FC<Props> = ({ professors, reviews, onAddRe
              <div className="text-sm text-slate-500">
                Have you taken a course with {professor.name.split(' ')[1]}?
              </div>
-             <Link 
-               to="/my-courses"
-               className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm"
-             >
-               Review from My Courses
-             </Link>
+             
+             {!currentUser ? (
+               <button 
+                 onClick={onRequireLogin}
+                 className="bg-slate-800 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-slate-900 transition-colors shadow-sm"
+               >
+                 Login to Verify & Rate
+               </button>
+             ) : isAuthLoading ? (
+               <button disabled className="bg-slate-200 text-slate-400 px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2">
+                 <Loader2 className="w-4 h-4 animate-spin" /> Verifying...
+               </button>
+             ) : isAuthorized ? (
+               <button 
+                 onClick={handleRateClick}
+                 className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm"
+               >
+                 {showForm ? "Cancel Review" : "Write a Review"}
+               </button>
+             ) : (
+               <div className="text-right">
+                 <button 
+                   disabled
+                   className="bg-slate-100 text-slate-400 cursor-not-allowed px-4 py-2 rounded-md text-sm font-medium shadow-sm transition-colors"
+                 >
+                   Write a Review
+                 </button>
+                 <p className="text-xs text-red-500 mt-1 max-w-[200px]">You can only review professors you have taken a course with via UKM SMP.</p>
+               </div>
+             )}
           </div>
         </div>
+
+        {/* Add Review Form */}
+        {showForm && currentUser && isAuthorized && (
+          <div className="mb-6">
+             <ReviewForm 
+               professorId={professor.id} 
+               courseCode={courseFromQuery || undefined}
+               validCourseCodes={validCourseCodes}
+               currentUser={currentUser}
+               onClose={() => setShowForm(false)} 
+               onSubmit={onAddReview} 
+             />
+          </div>
+        )}
 
         {/* AI Summary Section */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">

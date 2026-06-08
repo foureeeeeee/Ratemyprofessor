@@ -9,6 +9,7 @@ interface Props {
   professorId?: string;
   courseCode?: string;
   availableProfessors?: Professor[]; // For selecting professor when reviewing a course
+  validCourseCodes?: string[]; // Allowed courses from ProfessorDetails
   currentUser?: User | null;
   onClose: () => void;
   onSubmit: (review: Review) => void;
@@ -17,7 +18,7 @@ interface Props {
 const GRADES = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F', 'N/A'];
 const ATTENDANCE_OPTIONS = ['Mandatory', 'Optional', 'Not Recorded'];
 
-export const ReviewForm: React.FC<Props> = ({ courseId, professorId, courseCode = '', availableProfessors = [], currentUser, onClose, onSubmit }) => {
+export const ReviewForm: React.FC<Props> = ({ courseId, professorId, courseCode = '', availableProfessors = [], validCourseCodes, currentUser, onClose, onSubmit }) => {
   const [selectedProfessorId, setSelectedProfessorId] = useState(professorId || '');
   const [formData, setFormData] = useState({
     courseCode: courseCode,
@@ -40,6 +41,15 @@ export const ReviewForm: React.FC<Props> = ({ courseId, professorId, courseCode 
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   useEffect(() => {
+    if (validCourseCodes) {
+      setIsCheckingEnrollment(false);
+      setIsEnrolled(true);
+      if (!formData.courseCode && validCourseCodes.length > 0) {
+        setFormData(prev => ({ ...prev, courseCode: validCourseCodes[0] }));
+      }
+      return;
+    }
+
     const checkEnrollment = async () => {
       // Use courseCode to verify enrollment now that the schema uses course_code
       if (!courseCode || !currentUser?.email) {
@@ -67,7 +77,7 @@ export const ReviewForm: React.FC<Props> = ({ courseId, professorId, courseCode 
       }
     };
     checkEnrollment();
-  }, [courseCode, currentUser]);
+  }, [courseCode, currentUser, validCourseCodes]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -276,14 +286,29 @@ export const ReviewForm: React.FC<Props> = ({ courseId, professorId, courseCode 
             
             <div className="mb-4">
               <label className="block text-sm font-medium text-slate-700 mb-1">Course Code</label>
-              <input 
-                type="text" 
-                required
-                className="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2 border"
-                placeholder="e.g., CS101"
-                value={formData.courseCode}
-                onChange={e => setFormData(prev => ({...prev, courseCode: e.target.value}))}
-              />
+              {validCourseCodes ? (
+                <select
+                  required
+                  className="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2 border bg-white"
+                  value={formData.courseCode}
+                  onChange={e => setFormData(prev => ({...prev, courseCode: e.target.value}))}
+                >
+                  <option value="">-- Select Valid Course --</option>
+                  {validCourseCodes.map(code => (
+                    <option key={code} value={code}>{code}</option>
+                  ))}
+                </select>
+              ) : (
+                <input 
+                  type="text" 
+                  required
+                  disabled={!!courseCode || (!isEnrolled && !isCheckingEnrollment)}
+                  className="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2 border disabled:bg-slate-100 disabled:text-slate-500"
+                  placeholder="e.g., CS101"
+                  value={formData.courseCode}
+                  onChange={e => setFormData(prev => ({...prev, courseCode: e.target.value}))}
+                />
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4 mb-4">

@@ -447,6 +447,7 @@ export default function App() {
               element={
                 <ProfessorDetails 
                   professors={professors} 
+                  courses={courses}
                   reviews={reviews} 
                   onAddReview={handleAddReview}
                   currentUser={currentUser}
@@ -461,7 +462,7 @@ export default function App() {
             />
             <Route 
               path="/my-courses" 
-              element={<StudentDashboard currentUser={currentUser} courses={courses} reviews={reviews} />} 
+              element={<StudentDashboard currentUser={currentUser} courses={courses} reviews={reviews} professors={professors} />} 
             />
             
             {/* Admin Routes */}

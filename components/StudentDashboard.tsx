@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { BookOpen, CheckCircle, Clock } from 'lucide-react';
 import { Link, Navigate } from 'react-router-dom';
-import { Course, Review, User, SmpEnrollment } from '../types';
+import { Course, Review, User, SmpEnrollment, Professor } from '../types';
 import { supabase } from '../services/supabase';
 
 interface Props {
   currentUser: User | null;
   courses: Course[];
   reviews: Review[];
+  professors: Professor[];
 }
 
-export const StudentDashboard: React.FC<Props> = ({ currentUser, courses, reviews }) => {
+export const StudentDashboard: React.FC<Props> = ({ currentUser, courses, reviews, professors }) => {
   const [enrollments, setEnrollments] = useState<SmpEnrollment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -92,23 +93,41 @@ export const StudentDashboard: React.FC<Props> = ({ currentUser, courses, review
             </div>
           ) : (
             <div className="space-y-4">
-              {pendingCourses.map(course => (
-                <div key={course.id} className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-                  <div className="flex justify-between items-start gap-4">
-                    <div>
+              {pendingCourses.map(course => {
+                const courseProfessors = course.professorIds
+                  .map(id => professors.find(p => p.id === id))
+                  .filter((p): p is Professor => p !== undefined);
+
+                return (
+                  <div key={course.id} className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+                    <div className="mb-4">
                       <span className="inline-block px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-lg mb-2">Needs Review</span>
                       <h3 className="font-bold text-lg text-slate-900">{course.code}</h3>
                       <p className="text-slate-600 text-sm font-medium">{course.name}</p>
                     </div>
-                    <Link 
-                      to={`/courses/${course.id}`}
-                      className="px-4 py-2 bg-slate-900 text-white text-sm font-bold rounded-lg hover:bg-blue-700 transition-colors shrink-0"
-                    >
-                      Review Now
-                    </Link>
+                    
+                    <div className="space-y-2 mt-4 pt-4 border-t border-slate-100">
+                      <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Instructors</h4>
+                      {courseProfessors.length > 0 ? (
+                        <div className="flex flex-col gap-2">
+                          {courseProfessors.map(prof => (
+                            <Link 
+                              key={prof.id}
+                              to={`/professors/${prof.id}?action=review&course=${course.code}`}
+                              className="flex items-center justify-between px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors group"
+                            >
+                              <span className="text-sm font-medium text-slate-800 group-hover:text-blue-700">{prof.name}</span>
+                              <span className="text-xs font-bold text-blue-600 bg-blue-100 px-2 py-1 rounded">Review</span>
+                            </Link>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-slate-500 italic">No instructors assigned yet.</p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
