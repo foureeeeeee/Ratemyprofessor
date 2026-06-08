@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ChevronRight, Star } from 'lucide-react';
 import { Professor } from '../types';
 
 interface Props {
@@ -8,60 +8,36 @@ interface Props {
 }
 
 export const ProfessorCard: React.FC<Props> = ({ professor }) => {
-  // Generate a simplistic rating bar
-  const ratingBar = "#####".substring(0, Math.round(professor.averageRating)).padEnd(5, '-');
-
   return (
     <Link to={`/professors/${professor.id}`} className="block group h-full">
-      <div className="h-full bg-terminal-black border-2 border-terminal-gray hover:border-terminal-light transition-all duration-200 relative hover:shadow-[8px_8px_0_#e5e5e5] flex flex-col">
+      <div className="h-full bg-white/70 backdrop-blur-sm border border-slate-200/60 rounded-xl hover:border-blue-300 hover:shadow-lg hover:bg-white/95 transition-all duration-300 flex flex-col overflow-hidden">
         
-        {/* Header Decoration */}
-        <div className="h-6 border-b-2 border-terminal-gray bg-terminal-gray/10 flex items-center justify-between px-2">
-          <div className="flex gap-1">
-            <div className="w-2 h-2 bg-terminal-gray rounded-full"></div>
-            <div className="w-2 h-2 bg-terminal-gray rounded-full"></div>
-          </div>
-          <span className="text-[10px] text-terminal-gray uppercase">ID: {professor.id}</span>
-        </div>
-
-        <div className="p-6 flex-1 flex flex-col items-center text-center">
-          <div className="w-24 h-24 mb-4 border-2 border-terminal-light p-1">
-             <img 
-               src={professor.image} 
-               alt={professor.name} 
-               className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all"
-             />
+        <div className="p-6 flex-1 flex flex-col">
+          <div className="flex items-start justify-between mb-4">
+            <div className="w-16 h-16 rounded-full overflow-hidden border border-slate-200">
+               <img 
+                 src={professor.image} 
+                 alt={professor.name} 
+                 className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-500"
+               />
+            </div>
+            <div className="flex items-center gap-1 bg-amber-50 text-amber-700 px-2.5 py-1 rounded-full text-sm font-medium">
+               <Star className="w-4 h-4 fill-current" />
+               {professor.averageRating.toFixed(1)}
+            </div>
           </div>
           
-          <h3 className="text-lg font-bold text-terminal-light uppercase tracking-tight group-hover:text-terminal-accent transition-colors">
+          <h3 className="text-xl font-serif font-bold text-slate-900 group-hover:text-blue-700 transition-colors mb-1">
             {professor.name}
           </h3>
-          <p className="text-xs text-terminal-gray uppercase mt-1 mb-4 border-b border-terminal-gray/50 pb-2 w-full">
+          <p className="text-sm font-medium text-slate-500 mb-4">
             {professor.title}
           </p>
 
-          <div className="w-full text-left space-y-2 text-xs font-mono text-terminal-light mt-auto">
-            <div className="flex justify-between">
-              <span className="text-terminal-gray">DEPT:</span>
-              <span className="uppercase">{professor.department}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-terminal-gray">RATING:</span>
-              <span className="text-terminal-accent">[{ratingBar}] {professor.averageRating.toFixed(1)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-terminal-gray">REVIEWS:</span>
-              <span>{professor.reviewCount}</span>
-            </div>
+          <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between text-sm">
+             <span className="text-slate-600 font-medium">{professor.department}</span>
+             <span className="text-slate-500">{professor.reviewCount} Reviews</span>
           </div>
-        </div>
-        
-        {/* Footer Button */}
-        <div className="border-t-2 border-terminal-gray p-2 group-hover:bg-terminal-light group-hover:text-terminal-black transition-colors">
-           <div className="flex items-center justify-between text-xs font-bold uppercase">
-             <span>ACCESS_FILE</span>
-             <ArrowRight className="w-4 h-4" />
-           </div>
         </div>
       </div>
     </Link>

@@ -13,11 +13,13 @@ interface Props {
 
 export const ParticlesBackground: React.FC<Props> = ({
   className = "absolute inset-0 w-full h-full z-0",
-  particleColor = "#262626", 
-  particleCountFactor = 3000,
+  particleColor = "#94a3b8", // slate-400 for dot
+  lineColor = "rgba(148, 163, 184, 0.2)", // subtle slate-400 for line
+  particleCountFactor = 6000, // Less dense
   interactionDistance = 150,
-  baseSpeed = 0.5,
-  mouseForce = -1.5 
+  connectDistance = 150,
+  baseSpeed = 0.2,
+  mouseForce = -0.5 
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -30,7 +32,6 @@ export const ParticlesBackground: React.FC<Props> = ({
     let animationFrameId: number;
     let particles: Particle[] = [];
     let mouse = { x: -1000, y: -1000 };
-    const chars = ['+', 'x', '.', '0', '1', '*', '-', '|'];
 
     const getParticleCount = (width: number, height: number) => {
       return Math.floor((width * height) / particleCountFactor);
@@ -53,7 +54,6 @@ export const ParticlesBackground: React.FC<Props> = ({
       y: number;
       vx: number;
       vy: number;
-      char: string;
       size: number;
       color: string;
 
@@ -62,8 +62,7 @@ export const ParticlesBackground: React.FC<Props> = ({
         this.y = Math.random() * canvas.height;
         this.vx = (Math.random() - 0.5) * baseSpeed; 
         this.vy = (Math.random() - 0.5) * baseSpeed;
-        this.char = chars[Math.floor(Math.random() * chars.length)];
-        this.size = Math.floor(Math.random() * 10) + 10; // Font size
+        this.size = Math.random() * 2 + 0.5; // Small circles
         this.color = particleColor;
       }
 
@@ -94,16 +93,17 @@ export const ParticlesBackground: React.FC<Props> = ({
 
       draw() {
         if (!ctx) return;
-        ctx.font = `${this.size}px "Space Mono"`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fillStyle = this.color;
-        ctx.fillText(this.char, this.x, this.y);
+        ctx.fill();
       }
     }
 
     const initParticles = () => {
       particles = [];
       const count = getParticleCount(canvas.width, canvas.height);
-      const safeCount = Math.max(count, 5); 
+      const safeCount = Math.max(count, 10); 
       for (let i = 0; i < safeCount; i++) {
         particles.push(new Particle());
       }
@@ -116,6 +116,22 @@ export const ParticlesBackground: React.FC<Props> = ({
       for (let i = 0; i < particles.length; i++) {
         particles[i].update();
         particles[i].draw();
+        
+        // Draw lines
+        for (let j = i; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          if (distance < connectDistance) {
+            ctx.beginPath();
+            ctx.strokeStyle = lineColor;
+            ctx.lineWidth = 1 - (distance / connectDistance);
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
       }
       animationFrameId = requestAnimationFrame(animate);
     };

@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { Course, Professor, Review, User } from '../types';
 import { CourseCard } from './CourseCard';
 import { DEPARTMENTS } from '../constants';
-import { Filter, Search, Plus, X, Database } from 'lucide-react';
+import { Search, Plus, X, BookOpen, Filter } from 'lucide-react';
 
 interface Props {
   courses: Course[];
@@ -35,7 +35,7 @@ export const CourseList: React.FC<Props> = ({ courses, professors, reviews, onAd
   });
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 600);
+    const timer = setTimeout(() => setIsLoading(false), 300);
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => {
@@ -99,153 +99,154 @@ export const CourseList: React.FC<Props> = ({ courses, professors, reviews, onAd
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-terminal-black text-terminal-light">
-        <div className="text-4xl animate-pulse mb-4">[ .... ]</div>
-        <p className="text-sm font-bold text-terminal-gray">LOADING_COURSES...</p>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 text-slate-800">
+        <div className="w-10 h-10 border-4 border-ukm-blue border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p className="text-sm font-medium text-slate-500">Loading Course Catalog...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-terminal-black p-4 md:p-8">
-      
-      {/* Header */}
-      <div className="border-b-2 border-terminal-light mb-8 pb-4 flex justify-between items-end">
-        <div>
-          <h2 className="text-3xl md:text-5xl font-bold text-terminal-light uppercase tracking-tighter">
-            Course_Index
-          </h2>
-          <p className="text-terminal-gray mt-2 font-mono text-sm">
-            // Accessing {courses.length} curriculum files...
-          </p>
-        </div>
-        <div className="hidden md:block text-terminal-accent font-bold text-4xl opacity-20">
-          C++
-        </div>
-      </div>
-      
-      {/* Toolbar */}
-      <div className={`sticky top-20 z-30 transition-all duration-300 ${isScrolled ? 'py-2' : 'py-4'}`}>
-        <div className={`bg-terminal-black border-2 border-terminal-gray p-2 flex flex-col lg:flex-row gap-4 ${isScrolled ? 'border-terminal-light shadow-[4px_4px_0_#fff]' : ''}`}>
-          
-          <div className="flex-grow relative">
-             <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-terminal-accent">
-                <Database className="w-4 h-4" />
-             </div>
-             <input 
-                type="text" 
-                placeholder="SEARCH_CODE_OR_NAME..."
-                className="w-full pl-10 pr-4 py-2 bg-terminal-dark border border-terminal-gray text-terminal-light focus:border-terminal-accent focus:ring-0 outline-none uppercase placeholder:text-terminal-gray"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-             />
+    <div className="min-h-screen bg-slate-50 p-4 md:p-8 lg:p-12">
+      <div className="max-w-7xl mx-auto space-y-8">
+        
+        {/* Header */}
+        <div className="border-b border-slate-200 pb-6 flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+          <div>
+            <h2 className="text-4xl md:text-5xl font-serif font-bold text-slate-900 tracking-tight">
+              Course Catalog
+            </h2>
+            <p className="text-slate-500 mt-2 font-medium text-lg">
+              Showing {filteredCourses.length} registered academic courses
+            </p>
           </div>
-          
-          <div className="flex flex-col sm:flex-row gap-2">
-            <select 
-              className="px-4 py-2 bg-terminal-dark border border-terminal-gray text-terminal-light focus:border-terminal-accent outline-none uppercase cursor-pointer"
-              value={selectedDept}
-              onChange={(e) => setSelectedDept(e.target.value)}
-            >
-              <option value="All">ALL_DEPTS</option>
-              {DEPARTMENTS.map(dept => (
-                <option key={dept} value={dept}>{dept}</option>
-              ))}
-            </select>
-
-            <select 
-              className="px-4 py-2 bg-terminal-dark border border-terminal-gray text-terminal-light focus:border-terminal-accent outline-none uppercase cursor-pointer"
-              value={selectedProfId}
-              onChange={(e) => setSelectedProfId(e.target.value)}
-            >
-              <option value="All">ALL_INSTRUCTORS</option>
-              {professors.map(prof => (
-                <option key={prof.id} value={prof.id}>{prof.name}</option>
-              ))}
-            </select>
-
-            {onAddCourse && (
-              <button 
-                onClick={handleAddClick}
-                className={`px-4 py-2 font-bold uppercase border-2 transition-all whitespace-nowrap ${
-                  showAddForm 
-                    ? "bg-terminal-light text-terminal-black border-terminal-light" 
-                    : "bg-terminal-black text-terminal-accent border-terminal-accent hover:bg-terminal-accent hover:text-terminal-black"
-                }`}
+        </div>
+        
+        {/* Toolbar */}
+        <div className={`sticky top-20 z-30 transition-all duration-300 ${isScrolled ? 'py-2' : ''}`}>
+          <div className={`bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-xl p-3 flex flex-col lg:flex-row gap-3 shadow-sm transition-all duration-300 ${isScrolled ? 'shadow-md shadow-slate-200/50 bg-white/95' : ''}`}>
+            
+            <div className="flex-grow relative">
+               <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">
+                  <Search className="w-5 h-5" />
+               </div>
+               <input 
+                  type="text" 
+                  placeholder="Search by course code or name..."
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 focus:border-ukm-blue focus:ring-1 focus:ring-ukm-blue rounded-lg outline-none placeholder:text-slate-400 transition-all"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+               />
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-3">
+              <select 
+                className="px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-700 focus:border-ukm-blue rounded-lg outline-none cursor-pointer hover:bg-slate-100 transition-colors"
+                value={selectedDept}
+                onChange={(e) => setSelectedDept(e.target.value)}
               >
-                {showAddForm ? "CLOSE" : "NEW_COURSE"}
-              </button>
-            )}
+                <option value="All">All Departments</option>
+                {DEPARTMENTS.map(dept => (
+                  <option key={dept} value={dept}>{dept}</option>
+                ))}
+              </select>
+
+              <select 
+                className="px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-700 focus:border-ukm-blue rounded-lg outline-none cursor-pointer hover:bg-slate-100 transition-colors max-w-[200px]"
+                value={selectedProfId}
+                onChange={(e) => setSelectedProfId(e.target.value)}
+              >
+                <option value="All">All Instructors</option>
+                {professors.map(prof => (
+                  <option key={prof.id} value={prof.id}>{prof.name}</option>
+                ))}
+              </select>
+
+              {onAddCourse && (
+                <button 
+                  onClick={handleAddClick}
+                  className={`px-4 py-2.5 rounded-lg font-medium shadow-sm transition-colors flex items-center justify-center min-w-[3rem] whitespace-nowrap ${
+                    showAddForm 
+                      ? "bg-slate-200 text-slate-700 hover:bg-slate-300" 
+                      : "bg-ukm-blue text-white hover:bg-blue-900"
+                  }`}
+                >
+                  {showAddForm ? <X className="w-5 h-5" /> : "New Course"}
+                </button>
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Add Form */}
-      {showAddForm && currentUser && (
-        <div className="border-2 border-terminal-accent p-6 mb-12 bg-terminal-dark relative">
-          <div className="absolute top-0 left-0 bg-terminal-accent text-terminal-black px-2 py-1 text-xs font-bold uppercase">
-            NEW_COURSE_ENTRY
-          </div>
-          <form onSubmit={handleAddSubmit} className="mt-4 space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label className="text-xs text-terminal-gray uppercase">Course Code</label>
-                <input type="text" required className="w-full p-2 bg-terminal-black border border-terminal-gray text-terminal-light focus:border-terminal-accent outline-none" 
-                  value={newCourse.code} onChange={e => setNewCourse({...newCourse, code: e.target.value})} />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs text-terminal-gray uppercase">Course Name</label>
-                <input type="text" required className="w-full p-2 bg-terminal-black border border-terminal-gray text-terminal-light focus:border-terminal-accent outline-none"
-                  value={newCourse.name} onChange={e => setNewCourse({...newCourse, name: e.target.value})} />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs text-terminal-gray uppercase">Department</label>
-                <select className="w-full p-2 bg-terminal-black border border-terminal-gray text-terminal-light focus:border-terminal-accent outline-none"
-                  value={newCourse.department} onChange={e => setNewCourse({...newCourse, department: e.target.value})}>
-                  {DEPARTMENTS.map(d => <option key={d} value={d}>{d}</option>)}
-                </select>
-              </div>
-              <div className="md:col-span-2 space-y-1">
-                <label className="text-xs text-terminal-gray uppercase">Description</label>
-                <textarea className="w-full p-2 bg-terminal-black border border-terminal-gray text-terminal-light focus:border-terminal-accent outline-none resize-none h-20"
-                  value={newCourse.description} onChange={e => setNewCourse({...newCourse, description: e.target.value})} />
-              </div>
-              <div className="md:col-span-2 space-y-1">
-                <label className="text-xs text-terminal-gray uppercase">Instructors</label>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 border border-terminal-gray p-2 bg-terminal-black max-h-40 overflow-y-auto">
-                  {professors.map(prof => (
-                    <label key={prof.id} className="flex items-center gap-2 cursor-pointer hover:bg-terminal-gray/20 p-1">
-                      <input type="checkbox" checked={newCourse.professorIds.includes(prof.id)} onChange={() => toggleProfessorSelection(prof.id)}
-                        className="accent-terminal-accent bg-terminal-black border-terminal-gray" />
-                      <span className="text-xs uppercase truncate">{prof.name}</span>
-                    </label>
-                  ))}
+        {/* Add Form */}
+        {showAddForm && currentUser && (
+          <div className="bg-white/90 backdrop-blur-md border border-slate-200/60 rounded-2xl p-6 shadow-sm mb-8 animate-in slide-in-from-top-4 fade-in duration-300">
+            <h3 className="text-xl font-bold font-serif text-slate-900 mb-6 flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-ukm-blue" />
+              Register New Course
+            </h3>
+            <form onSubmit={handleAddSubmit} className="space-y-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-slate-700">Course Code</label>
+                  <input type="text" required className="w-full p-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 focus:border-ukm-blue outline-none shadow-sm placeholder:text-slate-400" 
+                    placeholder="e.g. CS101"
+                    value={newCourse.code} onChange={e => setNewCourse({...newCourse, code: e.target.value})} />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-slate-700">Course Name</label>
+                  <input type="text" required className="w-full p-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 focus:border-ukm-blue outline-none shadow-sm"
+                    value={newCourse.name} onChange={e => setNewCourse({...newCourse, name: e.target.value})} />
+                </div>
+                <div className="space-y-1.5 md:col-span-2">
+                  <label className="text-sm font-medium text-slate-700">Department</label>
+                  <select className="w-full p-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 focus:border-ukm-blue outline-none shadow-sm"
+                    value={newCourse.department} onChange={e => setNewCourse({...newCourse, department: e.target.value})}>
+                    {DEPARTMENTS.map(d => <option key={d} value={d}>{d}</option>)}
+                  </select>
+                </div>
+                <div className="space-y-1.5 md:col-span-2">
+                  <label className="text-sm font-medium text-slate-700">Description</label>
+                  <textarea className="w-full p-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 focus:border-ukm-blue outline-none shadow-sm resize-none h-24"
+                    value={newCourse.description} onChange={e => setNewCourse({...newCourse, description: e.target.value})} />
+                </div>
+                <div className="space-y-1.5 md:col-span-2">
+                  <label className="text-sm font-medium text-slate-700">Instructors</label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 border border-slate-200 rounded-lg p-4 bg-slate-50 max-h-48 overflow-y-auto">
+                    {professors.map(prof => (
+                      <label key={prof.id} className="flex items-center gap-3 cursor-pointer p-2 hover:bg-white rounded-md transition-colors border border-transparent hover:border-slate-200">
+                        <input type="checkbox" checked={newCourse.professorIds.includes(prof.id)} onChange={() => toggleProfessorSelection(prof.id)}
+                          className="w-4 h-4 text-ukm-blue rounded focus:ring-ukm-blue" />
+                        <span className="text-sm font-medium text-slate-700 truncate">{prof.name}</span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-            <button type="submit" className="w-full py-2 bg-terminal-accent text-terminal-black font-bold uppercase hover:opacity-90">
-              [ INITIALIZE_COURSE ]
-            </button>
-          </form>
-        </div>
-      )}
-
-      {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
-        {filteredCourses.length > 0 ? (
-          filteredCourses.map(course => (
-            <CourseCard 
-              key={course.id} 
-              course={course} 
-              professors={professors}
-              reviews={reviews}
-            />
-          ))
-        ) : (
-          <div className="col-span-full py-20 text-center border-2 border-dashed border-terminal-gray">
-            <p className="text-terminal-gray uppercase font-bold">ERR: COURSE_NOT_FOUND</p>
+              <button type="submit" className="w-full py-3 bg-ukm-blue text-white rounded-lg font-bold hover:bg-blue-900 transition-colors shadow-sm">
+                Save Course
+              </button>
+            </form>
           </div>
         )}
+
+        {/* Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
+          {filteredCourses.length > 0 ? (
+            filteredCourses.map(course => (
+              <CourseCard 
+                key={course.id} 
+                course={course} 
+                professors={professors}
+                reviews={reviews}
+              />
+            ))
+          ) : (
+            <div className="col-span-full py-20 text-center bg-white/50 backdrop-blur-sm border border-slate-200 border-dashed rounded-2xl">
+              <p className="text-slate-500 font-medium">No courses found matching your criteria.</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

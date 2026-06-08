@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ChevronRight, Star, BookOpen } from 'lucide-react';
 import { Course, Professor, Review } from '../types';
 
 interface Props {
@@ -16,7 +16,6 @@ export const CourseCard: React.FC<Props> = ({ course, professors, reviews }) => 
     ? courseReviews.reduce((acc, r) => acc + r.rating, 0) / courseReviews.length
     : 0;
 
-  const ratingBar = "#####".substring(0, Math.round(averageRating)).padEnd(5, '.');
   const teachingProfs = professors.filter(p => course.professorIds.includes(p.id));
 
   return (
@@ -24,45 +23,37 @@ export const CourseCard: React.FC<Props> = ({ course, professors, reviews }) => 
       to={`/courses/${course.id}`}
       className="block group h-full"
     >
-      <div className="h-full bg-terminal-black border-2 border-terminal-gray hover:border-terminal-accent transition-all duration-200 relative hover:shadow-[8px_8px_0_#d4ff00] flex flex-col">
+      <div className="h-full bg-white/70 backdrop-blur-sm border border-slate-200/60 rounded-xl hover:border-blue-300 hover:shadow-lg hover:bg-white/95 transition-all duration-300 flex flex-col overflow-hidden">
         
-        <div className="p-4 border-b border-terminal-gray flex justify-between items-center bg-terminal-gray/10">
-          <span className="font-bold text-terminal-accent text-lg tracking-widest">{course.code}</span>
-          <span className="text-xs text-terminal-gray uppercase">V.1.0</span>
+        <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+          <span className="font-bold text-ukm-blue border border-blue-200 bg-blue-50 px-2.5 py-1 rounded text-sm tracking-wide">{course.code}</span>
+          <div className="flex items-center gap-1 text-sm font-medium text-slate-600">
+             <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+             {averageRating > 0 ? averageRating.toFixed(1) : '—'}
+          </div>
         </div>
 
         <div className="p-6 flex-1 flex flex-col">
-          <h3 className="text-xl font-bold text-terminal-light mb-3 uppercase leading-tight group-hover:text-terminal-accent transition-colors">
+          <h3 className="text-xl font-serif font-bold text-slate-900 mb-2 group-hover:text-blue-700 transition-colors leading-snug">
             {course.name}
           </h3>
-          <p className="text-xs text-terminal-gray mb-6 font-mono leading-relaxed uppercase border-l-2 border-terminal-gray pl-2">
-            {course.description || "NO_DESCRIPTION_AVAILABLE."}
+          <p className="text-sm text-slate-600 mb-6 line-clamp-2 leading-relaxed">
+            {course.description || "Course description not available."}
           </p>
 
-          <div className="mt-auto space-y-2">
-            <div className="flex justify-between text-xs text-terminal-light font-mono border-b border-dashed border-terminal-gray pb-1">
-                <span>RATING:</span>
-                <span className="text-terminal-accent">[{ratingBar}] {averageRating.toFixed(1)}</span>
-            </div>
-            <div className="text-xs text-terminal-gray">
-                <span className="block mb-1">INSTRUCTORS:</span>
-                <div className="flex flex-wrap gap-1">
+          <div className="mt-auto space-y-3">
+            <div className="text-xs text-slate-500">
+                <span className="block font-medium mb-1 text-slate-400 uppercase tracking-wider">Instructors</span>
+                <div className="flex flex-wrap gap-1.5">
                     {teachingProfs.length > 0 ? teachingProfs.slice(0, 3).map(p => (
-                        <span key={p.id} className="bg-terminal-gray text-terminal-black px-1 uppercase">
+                        <span key={p.id} className="bg-slate-100 text-slate-700 px-2 py-1 object-cover rounded-md font-medium text-xs">
                             {p.name.split(' ').pop()}
                         </span>
-                    )) : <span className="text-terminal-gray/50">TBA</span>}
-                    {teachingProfs.length > 3 && <span className="bg-terminal-gray text-terminal-black px-1">+{teachingProfs.length - 3}</span>}
+                    )) : <span className="text-slate-400 italic">To be announced</span>}
+                    {teachingProfs.length > 3 && <span className="bg-slate-100 text-slate-600 px-2 py-1 rounded-md font-medium text-xs">+{teachingProfs.length - 3}</span>}
                 </div>
             </div>
           </div>
-        </div>
-        
-        <div className="border-t-2 border-terminal-gray p-2 group-hover:bg-terminal-accent group-hover:text-terminal-black transition-colors">
-           <div className="flex items-center justify-between text-xs font-bold uppercase">
-             <span>READ_REVIEWS</span>
-             <ArrowRight className="w-4 h-4" />
-           </div>
         </div>
       </div>
     </Link>

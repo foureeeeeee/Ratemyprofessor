@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ArrowRight, Search } from 'lucide-react';
+import { ArrowRight, Search, BookOpen } from 'lucide-react';
 import { ParticlesBackground } from './ParticlesBackground';
 import { Professor, Course } from '../types';
 
@@ -38,83 +38,68 @@ export const Hero: React.FC<Props> = ({ professors = [], courses = [] }) => {
   };
 
   return (
-    <div className="relative overflow-hidden min-h-[calc(100vh-4rem)] flex items-center justify-center bg-terminal-black">
-      <div className="absolute inset-0 z-0">
+    <div className="relative overflow-hidden min-h-[calc(100vh-4rem)] flex items-center justify-center bg-slate-50">
+      <div className="absolute inset-0 z-0 opacity-100 mix-blend-multiply">
         <ParticlesBackground 
-          particleCountFactor={3000}
-          baseSpeed={0.4}
-          particleColor="#333"
-          mouseForce={-2.0}
+          particleCountFactor={2000}
+          baseSpeed={0.3}
+          particleColor="#64748b"
+          lineColor="rgba(100, 116, 139, 0.3)"
+          mouseForce={-0.8}
+          connectDistance={180}
         />
       </div>
       
-      {/* Glass blur overlay to ensure main content focus */}
-      <div className="absolute inset-0 z-0 backdrop-blur-[2px] bg-terminal-black/40 pointer-events-none"></div>
+      {/* Subtle radial gradient to center content visually */}
+      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,transparent_0%,#f8fafc_90%)] pointer-events-none"></div>
       
-      <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
-        {/* ASCII Art Banner */}
-        <pre className="text-[0.5rem] md:text-xs leading-none text-terminal-light opacity-80 mb-8 hidden sm:block select-none">
-{`
-██████╗  █████╗ ████████╗███████╗    ███╗   ███╗██╗   ██╗    ██████╗ ██████╗  ██████╗ ███████╗
-██╔══██╗██╔══██╗╚══██╔══╝██╔════╝    ████╗ ████║╚██╗ ██╔╝    ██╔══██╗██╔══██╗██╔═══██╗██╔════╝
-██████╔╝███████║   ██║   █████╗      ██╔████╔██║ ╚████╔╝     ██████╔╝██████╔╝██║   ██║█████╗  
-██╔══██╗██╔══██║   ██║   ██╔══╝      ██║╚██╔╝██║  ╚██╔╝      ██╔═══╝ ██╔══██╗██║   ██║██╔══╝  
-██║  ██║██║  ██║   ██║   ███████╗    ██║ ╚═╝ ██║   ██║       ██║     ██║  ██║╚██████╔╝██║     
-╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚══════╝    ╚═╝     ╚═╝   ╚═╝       ╚═╝     ╚═╝  ╚═╝ ╚═════╝ ╚═╝     
-`}
-        </pre>
-        <h1 className="text-4xl md:text-6xl font-bold text-terminal-light mb-6 tracking-tighter sm:hidden">
-          RATE_MY_<br/>PROFESSOR
-        </h1>
-
-        <div className="inline-block border-2 border-terminal-accent p-1 mb-10 bg-terminal-black">
-          <div className="bg-terminal-accent text-terminal-black px-4 py-1 font-bold text-sm md:text-base uppercase tracking-widest">
-            System v2.0 // Online
+      <div className="relative z-10 max-w-4xl mx-auto px-6 text-center mt-[-4rem]">
+        <div className="inline-flex items-center justify-center mb-8">
+          <div className="p-4 bg-white shadow-md border border-slate-200 rounded-full mx-auto align-middle">
+             <BookOpen className="w-8 h-8 text-slate-800" />
           </div>
         </div>
+        
+        <h1 className="text-5xl md:text-7xl font-serif font-bold text-slate-900 mb-6 tracking-tight leading-tight">
+          Universiti Kebangsaan Malaysia <br className="hidden md:block" />
+          <span className="text-slate-600 italic font-medium">Academic Review Index</span>
+        </h1>
 
-        <p className="text-terminal-gray text-sm md:text-lg max-w-2xl mx-auto mb-12 font-bold uppercase tracking-widest">
-          &gt; Accessing verified academic records... <br/>
-          &gt; Optimized for decision making.
+        <p className="text-slate-600 text-lg md:text-xl max-w-2xl mx-auto mb-12 font-medium leading-relaxed">
+          Access verified course and instructor evaluations. Empowering students with transparent academic insights to make informed enrollment decisions.
         </p>
         
-        {/* Terminal Search Box */}
-        <div className="max-w-xl mx-auto">
-          <form onSubmit={handleSearch} className="group relative">
-            <div className="absolute -inset-1 bg-terminal-accent opacity-20 group-hover:opacity-40 transition-opacity blur-sm"></div>
-            <div className="relative flex items-center bg-terminal-black border-2 border-terminal-light group-focus-within:border-terminal-accent transition-colors">
-              <div className="pl-4 pr-2 text-terminal-accent font-bold">
-                root@ukm:~#
-              </div>
-              <input 
-                type="text" 
-                className="w-full h-14 bg-transparent text-terminal-light outline-none font-mono placeholder:text-terminal-gray uppercase"
-                placeholder="grep 'professor_name'"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <button 
-                type="submit"
-                className="h-14 px-6 bg-terminal-light text-terminal-black hover:bg-terminal-accent font-bold uppercase transition-colors flex items-center"
-              >
-                EXEC <ArrowRight className="ml-2 w-4 h-4" />
-              </button>
+        {/* Search Box */}
+        <div className="max-w-3xl mx-auto bg-white/95 backdrop-blur-md p-2 rounded-2xl shadow-2xl shadow-slate-200/50 border border-slate-300 focus-within:ring-4 focus-within:ring-slate-900/5 focus-within:border-slate-400 transition-all duration-300">
+          <form onSubmit={handleSearch} className="relative flex items-center">
+            <div className="pl-6 pr-4 text-slate-400">
+              <Search className="w-6 h-6" strokeWidth={2} />
             </div>
+            <input 
+              type="text" 
+              className="w-full h-14 bg-transparent text-slate-900 outline-none font-sans text-xl placeholder:text-slate-400 font-medium"
+              placeholder="Search faculty, courses, or departments..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <button 
+              type="submit"
+              className="h-14 px-8 bg-slate-900 text-white rounded-xl font-bold text-lg hover:bg-slate-800 focus:ring-4 focus:ring-slate-900/20 transition-all shadow-md flex items-center gap-2 pr-8 ml-2 whitespace-nowrap"
+            >
+              Search <ArrowRight className="w-5 h-5" strokeWidth={2.5} />
+            </button>
           </form>
         </div>
 
-        <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-bold text-terminal-gray uppercase">
-          <div className="border border-terminal-gray p-2 hover:border-terminal-light hover:text-terminal-light transition-colors cursor-default">
-            [+] Verified_Reviews
+        <div className="mt-16 flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-500">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Verified Reviews
           </div>
-          <div className="border border-terminal-gray p-2 hover:border-terminal-light hover:text-terminal-light transition-colors cursor-default">
-            [+] Quality_Metrics
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-amber-500"></span> Authentic Insights
           </div>
-          <div className="border border-terminal-gray p-2 hover:border-terminal-light hover:text-terminal-light transition-colors cursor-default">
-            [+] Data_Analysis
-          </div>
-          <Link to="/admin/login" className="border border-terminal-gray p-2 hover:bg-terminal-gray hover:text-terminal-light transition-colors flex items-center justify-center">
-            Admin_Login &rarr;
+          <Link to="/admin/login" className="flex items-center gap-1 hover:text-ukm-blue transition-colors underline underline-offset-4 decoration-slate-300">
+            Administrator Access &rarr;
           </Link>
         </div>
       </div>

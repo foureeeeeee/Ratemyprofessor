@@ -14,7 +14,7 @@ interface Props {
   reviews: Review[];
 }
 
-const COLORS = ['#d4ff00', '#e5e5e5', '#262626', '#525252', '#737373'];
+const COLORS = ['#1e3a8a', '#3b82f6', '#93c5fd', '#bfdbfe', '#eff6ff']; // UKM blue variations
 
 export const Dashboard: React.FC<Props> = ({ professors, reviews }) => {
   
@@ -46,7 +46,7 @@ export const Dashboard: React.FC<Props> = ({ professors, reviews }) => {
     });
     return Object.keys(stats)
       .map(dept => ({
-        name: dept.substring(0, 10), // Truncate for ASCII look
+        name: dept.substring(0, 10), // Truncate
         Quality: stats[dept].count ? parseFloat((stats[dept].totalRating / stats[dept].count).toFixed(2)) : 0,
         Difficulty: stats[dept].count ? parseFloat((stats[dept].totalDifficulty / stats[dept].count).toFixed(2)) : 0,
         reviewCount: stats[dept].count
@@ -78,14 +78,16 @@ export const Dashboard: React.FC<Props> = ({ professors, reviews }) => {
     return Object.entries(stats).map(([code, d]) => ({ code, avgDifficulty: parseFloat((d.totalDiff / d.count).toFixed(1)), count: d.count })).sort((a, b) => b.avgDifficulty - a.avgDifficulty).slice(0, 5);
   }, [reviews]);
 
-  // Custom Tooltip for ASCII Look
+  // Clean Tooltip for Academic Look
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-terminal-black border border-terminal-light p-2 text-xs font-mono">
-          <p className="text-terminal-accent uppercase">{label}</p>
+        <div className="bg-white/90 backdrop-blur-md border border-slate-200/60 shadow-xl p-3 rounded-lg text-sm text-slate-800">
+          <p className="font-bold text-slate-900 border-b border-slate-100 pb-1 mb-2">{label}</p>
           {payload.map((p: any) => (
-            <p key={p.name} style={{ color: p.color }}>{p.name}: {p.value}</p>
+            <p key={p.name} style={{ color: p.color }} className="font-medium">
+              {p.name}: <span className="font-bold">{p.value}</span>
+            </p>
           ))}
         </div>
       );
@@ -94,115 +96,125 @@ export const Dashboard: React.FC<Props> = ({ professors, reviews }) => {
   };
 
   return (
-    <div className="min-h-screen bg-terminal-black p-4 md:p-8 font-mono text-terminal-light">
-      
-      <div className="border-b-2 border-terminal-light mb-12 pb-4">
-        <h1 className="text-3xl md:text-5xl font-bold uppercase tracking-tighter">System_Analytics</h1>
-        <p className="text-terminal-gray mt-2 text-sm">// Real-time data visualization module.</p>
-      </div>
+    <div className="min-h-screen bg-slate-50 p-4 md:p-8 lg:p-12 text-slate-800">
+      <div className="max-w-7xl mx-auto">
+        <div className="border-b border-slate-200 mb-10 pb-6">
+          <h1 className="text-4xl md:text-5xl font-bold font-serif text-slate-900 tracking-tight">System Analytics</h1>
+          <p className="text-slate-500 mt-2 text-lg">Real-time academic data visualization.</p>
+        </div>
 
-      {/* KPI Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-        {[
-          { label: 'TOTAL_REVIEWS', val: reviews.length, icon: Users, color: 'text-terminal-light' },
-          { label: 'AVG_QUALITY', val: globalStats.avgRating, icon: Award, color: 'text-terminal-accent' },
-          { label: 'AVG_DIFFICULTY', val: globalStats.avgDifficulty, icon: AlertTriangle, color: 'text-red-500' },
-          { label: 'RETAKE_RATE', val: `${globalStats.wouldTakeAgain}%`, icon: CheckCircle, color: 'text-green-500' }
-        ].map((kpi) => (
-          <div key={kpi.label} className="bg-terminal-dark border border-terminal-gray p-4 relative overflow-hidden group hover:border-terminal-light transition-colors">
-            <div className="flex justify-between items-start mb-4">
-              <span className="text-xs text-terminal-gray font-bold">{kpi.label}</span>
-              <kpi.icon className={`w-5 h-5 ${kpi.color}`} />
+        {/* KPI Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          {[
+            { label: 'Total Reviews', val: reviews.length, icon: Users, color: 'text-ukm-blue' },
+            { label: 'Avg Quality', val: globalStats.avgRating, icon: Award, color: 'text-amber-500' },
+            { label: 'Avg Difficulty', val: globalStats.avgDifficulty, icon: AlertTriangle, color: 'text-rose-500' },
+            { label: 'Retake Rate', val: `${globalStats.wouldTakeAgain}%`, icon: CheckCircle, color: 'text-emerald-500' }
+          ].map((kpi) => (
+            <div key={kpi.label} className="bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-2xl p-6 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-blue-200 hover:bg-white/95 transition-all">
+              <div className="flex justify-between items-start mb-4">
+                <span className="text-sm text-slate-500 font-medium">{kpi.label}</span>
+                <div className={`p-2 rounded-lg bg-slate-50 group-hover:bg-blue-50 transition-colors`}>
+                  <kpi.icon className={`w-5 h-5 ${kpi.color}`} />
+                </div>
+              </div>
+              <div className="text-4xl font-bold text-slate-900">{kpi.val}</div>
+              <div className="absolute bottom-0 left-0 w-full h-1 bg-slate-100 group-hover:bg-ukm-blue transition-colors"></div>
             </div>
-            <div className="text-4xl font-bold">{kpi.val}</div>
-            <div className="absolute bottom-0 left-0 w-full h-1 bg-terminal-gray group-hover:bg-terminal-accent transition-colors"></div>
-          </div>
-        ))}
-      </div>
-
-      {/* Charts Row 1 */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
-        <div className="lg:col-span-2 bg-terminal-dark border border-terminal-gray p-6">
-          <h3 className="text-lg font-bold uppercase mb-6 border-b border-terminal-gray/50 pb-2">Performance_By_Dept</h3>
-          <div className="h-64 w-full">
-            <ResponsiveContainer>
-              <BarChart data={departmentStats}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#262626" vertical={false} />
-                <XAxis dataKey="name" tick={{fill: '#737373', fontSize: 10}} axisLine={false} />
-                <YAxis tick={{fill: '#737373', fontSize: 10}} axisLine={false} />
-                <Tooltip content={<CustomTooltip />} cursor={{fill: '#262626'}} />
-                <Legend />
-                <Bar dataKey="Quality" fill="#d4ff00" radius={[0,0,0,0]} barSize={20} />
-                <Bar dataKey="Difficulty" fill="#525252" radius={[0,0,0,0]} barSize={20} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          ))}
         </div>
 
-        <div className="bg-terminal-dark border border-terminal-gray p-6">
-          <h3 className="text-lg font-bold uppercase mb-6 border-b border-terminal-gray/50 pb-2">Grade_Dist</h3>
-          <div className="h-64 w-full">
-            <ResponsiveContainer>
-              <AreaChart data={gradeData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#262626" vertical={false} />
-                <XAxis dataKey="name" tick={{fill: '#737373', fontSize: 10}} axisLine={false} />
-                <Tooltip content={<CustomTooltip />} />
-                <Area type="step" dataKey="value" stroke="#d4ff00" strokeWidth={2} fill="#d4ff00" fillOpacity={0.2} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
-
-      {/* Row 2 */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-         <div className="bg-terminal-dark border border-terminal-gray p-6">
-            <h3 className="text-lg font-bold uppercase mb-6 border-b border-terminal-gray/50 pb-2">Attendance</h3>
-            <div className="h-64 w-full">
+        {/* Charts Row 1 */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+          <div className="lg:col-span-2 bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all">
+            <h3 className="text-xl font-bold font-serif text-slate-900 mb-6 pb-2 border-b border-slate-100">Performance By Department</h3>
+            <div className="h-72 w-full">
               <ResponsiveContainer>
-                <PieChart>
-                  <Pie data={attendanceData} innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
-                    {attendanceData.map((_, index) => <Cell key={`cell-${index}`} fill={COLORS[index]} strokeWidth={0} />)}
-                  </Pie>
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend />
-                </PieChart>
+                <BarChart data={departmentStats} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                  <XAxis dataKey="name" tick={{fill: '#64748b', fontSize: 12}} axisLine={false} tickLine={false} />
+                  <YAxis tick={{fill: '#64748b', fontSize: 12}} axisLine={false} tickLine={false} />
+                  <Tooltip content={<CustomTooltip />} cursor={{fill: '#f8fafc'}} />
+                  <Legend wrapperStyle={{ paddingTop: '20px' }} />
+                  <Bar dataKey="Quality" fill="#1e3a8a" radius={[4, 4, 0, 0]} barSize={24} />
+                  <Bar dataKey="Difficulty" fill="#94a3b8" radius={[4, 4, 0, 0]} barSize={24} />
+                </BarChart>
               </ResponsiveContainer>
             </div>
-         </div>
+          </div>
 
-         <div className="bg-terminal-dark border border-terminal-gray p-6">
-            <h3 className="text-lg font-bold uppercase mb-6 border-b border-terminal-gray/50 pb-2">Hall_Of_Fame</h3>
-            <div className="space-y-3">
-              {topProfessors.map((p, i) => (
-                <div key={p.id} className="flex justify-between items-center border-b border-terminal-gray/30 pb-2">
-                  <div className="flex items-center gap-3">
-                    <span className="text-terminal-accent font-bold">#{i+1}</span>
-                    <span className="text-xs uppercase">{p.name}</span>
-                  </div>
-                  <span className="bg-terminal-accent text-terminal-black px-2 text-xs font-bold">{p.averageRating.toFixed(1)}</span>
-                </div>
-              ))}
+          <div className="bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all">
+            <h3 className="text-xl font-bold font-serif text-slate-900 mb-6 pb-2 border-b border-slate-100">Grade Distribution</h3>
+            <div className="h-72 w-full">
+              <ResponsiveContainer>
+                <AreaChart data={gradeData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                  <XAxis dataKey="name" tick={{fill: '#64748b', fontSize: 12}} axisLine={false} tickLine={false} />
+                  <YAxis tick={{fill: '#64748b', fontSize: 12}} axisLine={false} tickLine={false} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Area type="monotone" dataKey="value" stroke="#1e3a8a" strokeWidth={3} fill="#bfdbfe" fillOpacity={0.5} />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
-         </div>
+          </div>
+        </div>
 
-         <div className="bg-terminal-dark border border-terminal-gray p-6">
-            <h3 className="text-lg font-bold uppercase mb-6 border-b border-terminal-gray/50 pb-2">Hardest_Courses</h3>
-            <div className="space-y-3">
-              {difficultCourses.map((c) => (
-                <div key={c.code} className="flex justify-between items-center border-b border-terminal-gray/30 pb-2">
-                  <div className="flex items-center gap-3">
-                    <AlertTriangle className="w-3 h-3 text-red-500" />
-                    <span className="text-xs uppercase font-bold">{c.code}</span>
+        {/* Row 2 */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+           <div className="bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all">
+              <h3 className="text-xl font-bold font-serif text-slate-900 mb-6 pb-2 border-b border-slate-100">Attendance Policies</h3>
+              <div className="h-64 w-full">
+                <ResponsiveContainer>
+                  <PieChart>
+                    <Pie data={attendanceData} innerRadius={65} outerRadius={90} paddingAngle={2} dataKey="value" stroke="none">
+                      {attendanceData.map((_, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
+                    </Pie>
+                    <Tooltip content={<CustomTooltip />} />
+                    <Legend wrapperStyle={{ paddingTop: '20px' }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+           </div>
+
+           <div className="bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all">
+              <h3 className="text-xl font-bold font-serif text-slate-900 mb-6 pb-2 border-b border-slate-100">Top Rated Faculty</h3>
+              <div className="space-y-4">
+                {topProfessors.map((p, i) => (
+                  <div key={p.id} className="flex justify-between items-center group">
+                    <div className="flex items-center gap-3">
+                      <span className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
+                        i === 0 ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500'
+                      }`}>
+                        {i+1}
+                      </span>
+                      <span className="text-sm font-medium text-slate-700 group-hover:text-ukm-blue transition-colors">{p.name}</span>
+                    </div>
+                    <span className="font-bold text-ukm-blue bg-blue-50 px-2 py-1 rounded text-sm">{p.averageRating.toFixed(1)}</span>
                   </div>
-                  <div className="text-right">
-                    <span className="text-red-500 font-bold text-sm">{c.avgDifficulty.toFixed(1)}</span>
-                    <span className="text-[10px] text-terminal-gray block">DIFF</span>
+                ))}
+              </div>
+           </div>
+
+           <div className="bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all">
+              <h3 className="text-xl font-bold font-serif text-slate-900 mb-6 pb-2 border-b border-slate-100">Most Difficult Courses</h3>
+              <div className="space-y-4">
+                {difficultCourses.map((c) => (
+                  <div key={c.code} className="flex justify-between items-center group">
+                    <div className="flex items-center gap-3">
+                      <div className="p-1.5 rounded-md bg-rose-50 text-rose-500">
+                        <AlertTriangle className="w-3.5 h-3.5" />
+                      </div>
+                      <span className="font-bold text-slate-700 group-hover:text-rose-600 transition-colors">{c.code}</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-rose-600 font-bold">{c.avgDifficulty.toFixed(1)}</span>
+                      <span className="text-xs text-slate-400 ml-1 font-medium">DIFF</span>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-         </div>
+                ))}
+              </div>
+           </div>
+        </div>
       </div>
     </div>
   );
