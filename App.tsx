@@ -8,6 +8,7 @@ import { CourseList } from './components/CourseList';
 import { CourseDetails } from './components/CourseDetails';
 import { ProfessorDetails } from './components/ProfessorDetails';
 import { Dashboard } from './components/Dashboard';
+import { StudentDashboard } from './components/StudentDashboard';
 import { AdminLogin } from './components/AdminLogin';
 import { AdminDashboard } from './components/AdminDashboard';
 import { StudentLoginModal } from './components/StudentLoginModal';
@@ -457,6 +458,10 @@ export default function App() {
             <Route 
               path="/dashboard" 
               element={<Dashboard professors={professors} reviews={reviews} />} 
+            />
+            <Route 
+              path="/my-courses" 
+              element={<StudentDashboard currentUser={currentUser} courses={courses} reviews={reviews} />} 
             />
             
             {/* Admin Routes */}

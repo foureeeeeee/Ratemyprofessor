@@ -174,26 +174,14 @@ export const ProfessorDetails: React.FC<Props> = ({ professors, reviews, onAddRe
              <div className="text-sm text-slate-500">
                Have you taken a course with {professor.name.split(' ')[1]}?
              </div>
-             <button 
-               onClick={handleRateClick}
+             <Link 
+               to="/my-courses"
                className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm"
              >
-               {currentUser ? (showForm ? "Cancel Review" : "Rate This Professor") : "Login to Verify & Rate"}
-             </button>
+               Review from My Courses
+             </Link>
           </div>
         </div>
-
-        {/* Add Review Form */}
-        {showForm && currentUser && (
-          <div className="mb-6">
-             <ReviewForm 
-               professorId={professor.id} 
-               currentUser={currentUser}
-               onClose={() => setShowForm(false)} 
-               onSubmit={onAddReview} 
-             />
-          </div>
-        )}
 
         {/* AI Summary Section */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">

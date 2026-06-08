@@ -44,6 +44,8 @@ export const Navbar: React.FC<Props> = ({ currentUser, onTriggerLogin, onLogout 
               <div className="w-px bg-terminal-gray mx-1"></div>
               <Link to="/courses" className={navClass('/courses')}>Courses</Link>
               <div className="w-px bg-terminal-gray mx-1"></div>
+              <Link to="/my-courses" className={navClass('/my-courses')}>My Courses</Link>
+              <div className="w-px bg-terminal-gray mx-1"></div>
               <Link to="/dashboard" className={navClass('/dashboard')}>Data</Link>
             </div>
 
@@ -90,6 +92,7 @@ export const Navbar: React.FC<Props> = ({ currentUser, onTriggerLogin, onLogout 
             <Link to="/" onClick={closeMobileMenu} className="block px-3 py-2 text-base font-medium text-terminal-light hover:bg-terminal-gray hover:text-terminal-accent uppercase">Home</Link>
             <Link to="/professors" onClick={closeMobileMenu} className="block px-3 py-2 text-base font-medium text-terminal-light hover:bg-terminal-gray hover:text-terminal-accent uppercase">Professors</Link>
             <Link to="/courses" onClick={closeMobileMenu} className="block px-3 py-2 text-base font-medium text-terminal-light hover:bg-terminal-gray hover:text-terminal-accent uppercase">Courses</Link>
+            <Link to="/my-courses" onClick={closeMobileMenu} className="block px-3 py-2 text-base font-medium text-terminal-light hover:bg-terminal-gray hover:text-terminal-accent uppercase">My Courses</Link>
             <Link to="/dashboard" onClick={closeMobileMenu} className="block px-3 py-2 text-base font-medium text-terminal-light hover:bg-terminal-gray hover:text-terminal-accent uppercase">Analytics</Link>
             
             <div className="pt-4 mt-4 border-t border-terminal-gray">

@@ -58,6 +58,13 @@ export interface DepartmentStats {
   professorCount: number;
 }
 
+export interface SmpEnrollment {
+  id: string;
+  student_email: string;
+  course_code: string;
+  semester: string;
+}
+
 export interface Report {
   id: string;
   targetId: string;

@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Review, Professor, User } from '../types';
-import { Star, CheckCircle2, Circle, BarChart3, ShieldCheck, AlertCircle } from 'lucide-react';
+import { Star, CheckCircle2, Circle, BarChart3, ShieldCheck, AlertCircle, Loader2 } from 'lucide-react';
+import { supabase } from '../services/supabase';
 
 interface Props {
+  courseId?: string; // Add courseId here
   professorId?: string;
   courseCode?: string;
   availableProfessors?: Professor[]; // For selecting professor when reviewing a course
@@ -14,7 +17,7 @@ interface Props {
 const GRADES = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F', 'N/A'];
 const ATTENDANCE_OPTIONS = ['Mandatory', 'Optional', 'Not Recorded'];
 
-export const ReviewForm: React.FC<Props> = ({ professorId, courseCode = '', availableProfessors = [], currentUser, onClose, onSubmit }) => {
+export const ReviewForm: React.FC<Props> = ({ courseId, professorId, courseCode = '', availableProfessors = [], currentUser, onClose, onSubmit }) => {
   const [selectedProfessorId, setSelectedProfessorId] = useState(professorId || '');
   const [formData, setFormData] = useState({
     courseCode: courseCode,
@@ -32,6 +35,40 @@ export const ReviewForm: React.FC<Props> = ({ professorId, courseCode = '', avai
     textbookUsed: false
   });
 
+  const [isCheckingEnrollment, setIsCheckingEnrollment] = useState(true);
+  const [isEnrolled, setIsEnrolled] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  useEffect(() => {
+    const checkEnrollment = async () => {
+      // Use courseCode to verify enrollment now that the schema uses course_code
+      if (!courseCode || !currentUser?.email) {
+        setIsCheckingEnrollment(false);
+        setIsEnrolled(false);
+        return;
+      }
+      try {
+        const { data, error } = await supabase
+          .from('mock_smp_enrollments')
+          .select('id')
+          .eq('student_email', currentUser.email)
+          .eq('course_code', courseCode)
+          .single();
+
+        if (data) {
+          setIsEnrolled(true);
+        } else {
+          setIsEnrolled(false);
+        }
+      } catch (error) {
+        setIsEnrolled(false);
+      } finally {
+        setIsCheckingEnrollment(false);
+      }
+    };
+    checkEnrollment();
+  }, [courseCode, currentUser]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -40,7 +77,11 @@ export const ReviewForm: React.FC<Props> = ({ professorId, courseCode = '', avai
       return;
     }
 
-    // If no professor ID was passed prop, use the selected one
+    if (!isEnrolled) {
+      alert("You must be enrolled in this course to review it.");
+      return;
+    }
+
     const finalProfessorId = professorId || selectedProfessorId;
     
     if (!finalProfessorId) {
@@ -64,7 +105,7 @@ export const ReviewForm: React.FC<Props> = ({ professorId, courseCode = '', avai
     };
 
     onSubmit(newReview);
-    onClose();
+    setShowSuccessModal(true);
   };
 
   const RatingInput = ({ label, value, field }: { label: string, value: number, field: keyof typeof formData }) => (
@@ -75,8 +116,9 @@ export const ReviewForm: React.FC<Props> = ({ professorId, courseCode = '', avai
           <button
             key={star}
             type="button"
+            disabled={!isEnrolled}
             onClick={() => setFormData(prev => ({ ...prev, [field]: star }))}
-            className={`p-1 transition-colors ${value >= star ? 'text-yellow-400' : 'text-slate-200'}`}
+            className={`p-1 transition-colors ${value >= star ? 'text-yellow-400' : 'text-slate-200'} ${!isEnrolled ? 'cursor-not-allowed opacity-50' : ''}`}
           >
             <Star className="w-5 h-5 fill-current" />
           </button>
@@ -84,6 +126,43 @@ export const ReviewForm: React.FC<Props> = ({ professorId, courseCode = '', avai
       </div>
     </div>
   );
+
+  if (isCheckingEnrollment) {
+    return (
+      <div className="bg-white rounded-xl shadow-lg border border-blue-100 p-8 flex flex-col items-center justify-center animate-in fade-in">
+        <Loader2 className="w-8 h-8 text-blue-600 animate-spin mb-4" />
+        <p className="text-slate-500 font-medium">Verifying SMP enrollment status...</p>
+      </div>
+    );
+  }
+
+  if (showSuccessModal) {
+    return (
+      <div className="bg-white rounded-xl shadow-lg border border-emerald-100 p-8 text-center animate-in zoom-in-95 duration-300">
+        <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+          <CheckCircle2 className="w-8 h-8" />
+        </div>
+        <h3 className="text-xl font-bold text-slate-900 mb-2">Successfully posted your review!</h3>
+        <p className="text-slate-600 mb-8">Thank you for contributing to the fairness of the system.</p>
+        
+        <div className="flex justify-center gap-4">
+          <button 
+            onClick={onClose}
+            className="px-6 py-2 border border-slate-300 rounded-md text-sm font-medium text-slate-700 hover:bg-slate-50 flex-1"
+          >
+            Close
+          </button>
+          <Link 
+            to="/my-courses"
+            onClick={onClose}
+            className="px-6 py-2 bg-blue-600 rounded-md text-sm font-medium text-white hover:bg-blue-700 flex-1"
+          >
+            Review More Courses
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-xl shadow-lg border border-blue-100 p-6 animate-in fade-in slide-in-from-top-4">
@@ -118,7 +197,19 @@ export const ReviewForm: React.FC<Props> = ({ professorId, courseCode = '', avai
       )}
       
       <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-6">
+        {!isEnrolled && (
+          <div className="mb-6 p-4 bg-amber-50 border border-amber-100 rounded-lg flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5" />
+            <div>
+              <h4 className="text-sm font-bold text-amber-900">Enrollment Not Found</h4>
+              <p className="text-xs text-amber-700 mt-1 leading-relaxed">
+                You can only review courses you have officially taken according to SMP. If you believe this is an error, please contact administration.
+              </p>
+            </div>
+          </div>
+        )}
+
+        <div className={`grid grid-cols-1 lg:grid-cols-2 gap-8 mb-6 ${!isEnrolled ? 'opacity-60 pointer-events-none' : ''}`}>
           {/* Left Column: Ratings */}
           <div>
             <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">Rating Metrics</h4>
@@ -282,11 +373,12 @@ export const ReviewForm: React.FC<Props> = ({ professorId, courseCode = '', avai
           </div>
         </div>
 
-        <div className="flex flex-col mb-6">
+        <div className={`flex flex-col mb-6 ${!isEnrolled ? 'opacity-60 pointer-events-none' : ''}`}>
           <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Written Feedback</h4>
           <textarea 
             required
             rows={4}
+            disabled={!isEnrolled}
             className="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2 border flex-grow resize-none"
             placeholder="Share your experience with this professor..."
             value={formData.comment}
@@ -307,7 +399,7 @@ export const ReviewForm: React.FC<Props> = ({ professorId, courseCode = '', avai
           </button>
           <button 
             type="submit"
-            disabled={!currentUser}
+            disabled={!currentUser || !isEnrolled}
             className="px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Submit Verified Review

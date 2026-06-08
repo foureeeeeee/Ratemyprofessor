@@ -243,6 +243,7 @@ export const CourseDetails: React.FC<Props> = ({ courses, professors, reviews, o
         {showReviewForm && onAddReview && currentUser && (
           <div className="mb-8">
             <ReviewForm 
+              courseId={course.id}
               courseCode={course.code}
               availableProfessors={teachingProfessors}
               currentUser={currentUser}
