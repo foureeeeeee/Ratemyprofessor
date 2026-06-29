@@ -10,7 +10,7 @@ export const DEPARTMENTS = [
 
 export const MOCK_PROFESSORS: Professor[] = [
   {
-    id: "1",
+    id: "11111111-1111-1111-1111-111111111111",
     name: "Dr. Aishah binti Ahmad",
     department: "Software Engineering",
     title: "Senior Lecturer",
@@ -19,7 +19,7 @@ export const MOCK_PROFESSORS: Professor[] = [
     reviewCount: 12
   },
   {
-    id: "2",
+    id: "22222222-2222-2222-2222-222222222222",
     name: "Prof. Tan Wei Ming",
     department: "Computer Science",
     title: "Associate Professor",
@@ -28,7 +28,7 @@ export const MOCK_PROFESSORS: Professor[] = [
     reviewCount: 8
   },
   {
-    id: "3",
+    id: "33333333-3333-3333-3333-333333333333",
     name: "Dr. Sarah Johnson",
     department: "Data Science",
     title: "Lecturer",
@@ -37,7 +37,7 @@ export const MOCK_PROFESSORS: Professor[] = [
     reviewCount: 25
   },
   {
-    id: "4",
+    id: "44444444-4444-4444-4444-444444444444",
     name: "Mr. Raj Kumar",
     department: "Information Technology",
     title: "Tutor",
@@ -46,7 +46,7 @@ export const MOCK_PROFESSORS: Professor[] = [
     reviewCount: 5
   },
   {
-    id: "5",
+    id: "55555555-5555-5555-5555-555555555555",
     name: "Dr. Lee Siew Lin",
     department: "Software Engineering",
     title: "Senior Lecturer",
@@ -55,7 +55,7 @@ export const MOCK_PROFESSORS: Professor[] = [
     reviewCount: 15
   },
   {
-    id: "6",
+    id: "66666666-6666-6666-6666-666666666666",
     name: "Prof. Michael Chen",
     department: "Multimedia",
     title: "Professor",
@@ -67,51 +67,51 @@ export const MOCK_PROFESSORS: Professor[] = [
 
 export const MOCK_COURSES: Course[] = [
   {
-    id: "c1",
+    id: "c1111111-1111-1111-1111-111111111111",
     code: "SE2023",
     name: "Software Design Patterns",
     department: "Software Engineering",
-    professorIds: ["1", "5"],
+    professorIds: ["11111111-1111-1111-1111-111111111111", "55555555-5555-5555-5555-555555555555"],
     description: "Introduction to GOF patterns and architectural principles."
   },
   {
-    id: "c2",
+    id: "c2222222-2222-2222-2222-222222222222",
     code: "CS1010",
     name: "Programming Fundamentals",
     department: "Computer Science",
-    professorIds: ["2", "4"],
+    professorIds: ["22222222-2222-2222-2222-222222222222", "44444444-4444-4444-4444-444444444444"],
     description: "Basic algorithm logic and C++ implementation."
   },
   {
-    id: "c3",
+    id: "c3333333-3333-3333-3333-333333333333",
     code: "DS3001",
     name: "Machine Learning Basics",
     department: "Data Science",
-    professorIds: ["3"],
+    professorIds: ["33333333-3333-3333-3333-333333333333"],
     description: "Supervised and unsupervised learning algorithms."
   },
   {
-    id: "c4",
+    id: "c4444444-4444-4444-4444-444444444444",
     code: "MM2001",
     name: "Digital Media Production",
     department: "Multimedia",
-    professorIds: ["6"],
+    professorIds: ["66666666-6666-6666-6666-666666666666"],
     description: "Video editing and sound engineering fundamentals."
   },
   {
-    id: "c5",
+    id: "c5555555-5555-5555-5555-555555555555",
     code: "IT1005",
     name: "Web Systems",
     department: "Information Technology",
-    professorIds: ["4", "1"],
+    professorIds: ["44444444-4444-4444-4444-444444444444", "11111111-1111-1111-1111-111111111111"],
     description: "Full stack web development using modern frameworks."
   }
 ];
 
 export const MOCK_REVIEWS: Review[] = [
   {
-    id: "r1",
-    professorId: "1",
+    id: "f1111111-1111-1111-1111-111111111111",
+    professorId: "11111111-1111-1111-1111-111111111111",
     studentName: "Anonymous",
     rating: 5,
     difficulty: 3,
@@ -131,8 +131,8 @@ export const MOCK_REVIEWS: Review[] = [
     textbookUsed: false
   },
   {
-    id: "r2",
-    professorId: "1",
+    id: "f2222222-2222-2222-2222-222222222222",
+    professorId: "11111111-1111-1111-1111-111111111111",
     studentName: "Zu Kaiquan",
     rating: 4,
     difficulty: 4,
@@ -152,8 +152,8 @@ export const MOCK_REVIEWS: Review[] = [
     textbookUsed: true
   },
   {
-    id: "r3",
-    professorId: "2",
+    id: "f3333333-3333-3333-3333-333333333333",
+    professorId: "22222222-2222-2222-2222-222222222222",
     studentName: "Anonymous",
     rating: 3,
     difficulty: 5,
@@ -173,8 +173,8 @@ export const MOCK_REVIEWS: Review[] = [
     textbookUsed: true
   },
   {
-    id: "r4",
-    professorId: "3",
+    id: "f4444444-4444-4444-4444-444444444444",
+    professorId: "33333333-3333-3333-3333-333333333333",
     studentName: "Sarah M.",
     rating: 5,
     difficulty: 2,
