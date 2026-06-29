@@ -626,9 +626,15 @@ export const AdminDashboard: React.FC<Props> = ({
                 </div>
                 
                 <h4 className="font-bold text-slate-800 mb-1">{item.reason}</h4>
-                <p className="text-sm text-slate-600 mb-2 bg-slate-50 p-3 rounded-lg border border-slate-100">
-                  "{item.details}"
-                </p>
+                {item.targetType === 'new_professor' || item.targetType === 'new_course' ? (
+                  <p className="text-sm text-slate-500 mb-2 bg-slate-50 p-3 rounded-lg border border-slate-100 italic">
+                    Suggestion details are attached to this request.
+                  </p>
+                ) : (
+                  <p className="text-sm text-slate-600 mb-2 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                    "{item.details}"
+                  </p>
+                )}
                 
                 <div className="text-xs text-slate-500 mb-4 flex items-center gap-1">
                   <span className="font-semibold">Reporter:</span> 
