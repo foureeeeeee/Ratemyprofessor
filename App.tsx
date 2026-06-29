@@ -98,10 +98,25 @@ export default function App() {
           reporterEmail: r.reporter_email
         }));
 
-        // Fallback to mock data if Supabase tables are empty (for initial setup)
-        setProfessors(mappedProfessors.length > 0 ? mappedProfessors : MOCK_PROFESSORS);
-        setCourses(mappedCourses.length > 0 ? mappedCourses : MOCK_COURSES);
-        setReviews(mappedReviews.length > 0 ? mappedReviews : MOCK_REVIEWS);
+        // Merge mock data with Supabase data to preserve initial mock state alongside new user-added data
+        const mergedProfessors = [
+          ...MOCK_PROFESSORS.filter(m => !mappedProfessors.some(p => p.id === m.id)), 
+          ...mappedProfessors
+        ];
+        
+        const mergedCourses = [
+          ...MOCK_COURSES.filter(m => !mappedCourses.some(c => c.id === m.id)), 
+          ...mappedCourses
+        ];
+        
+        const mergedReviews = [
+          ...MOCK_REVIEWS.filter(m => !mappedReviews.some(r => r.id === m.id)), 
+          ...mappedReviews
+        ];
+
+        setProfessors(mergedProfessors);
+        setCourses(mergedCourses);
+        setReviews(mergedReviews);
         setReports(mappedReports);
       } catch (error) {
         console.error("Error fetching from Supabase:", error);
@@ -167,7 +182,7 @@ export default function App() {
   const handleAddReview = async (newReview: Review) => {
     setReviews(prev => [newReview, ...prev]);
     try {
-      await supabase.from('reviews').insert({
+      const { error } = await supabase.from('reviews').insert({
         id: newReview.id,
         professor_id: newReview.professorId,
         student_name: newReview.studentName,
@@ -189,6 +204,9 @@ export default function App() {
         textbook_used: newReview.textbookUsed,
         verified: newReview.verified
       });
+      if (error) {
+        console.error("Supabase insert review error:", error);
+      }
     } catch (error) {
       console.error("Error adding review:", error);
     }
