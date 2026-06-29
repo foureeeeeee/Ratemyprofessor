@@ -627,9 +627,38 @@ export const AdminDashboard: React.FC<Props> = ({
                 
                 <h4 className="font-bold text-slate-800 mb-1">{item.reason}</h4>
                 {item.targetType === 'new_professor' || item.targetType === 'new_course' ? (
-                  <p className="text-sm text-slate-500 mb-2 bg-slate-50 p-3 rounded-lg border border-slate-100 italic">
-                    Suggestion details are attached to this request.
-                  </p>
+                  <div className="text-sm text-slate-600 mb-2 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                    {(() => {
+                      try {
+                        const parsed = JSON.parse(item.details);
+                        if (item.targetType === 'new_professor') {
+                          return (
+                            <div className="space-y-1">
+                              <div><span className="font-medium">Name:</span> {parsed.name}</div>
+                              <div><span className="font-medium">Department:</span> {parsed.department}</div>
+                              <div><span className="font-medium">Title:</span> {parsed.title}</div>
+                              {parsed.image && (
+                                <div className="mt-2 flex items-center gap-2">
+                                  <span className="font-medium">Image:</span>
+                                  <img src={parsed.image} alt={parsed.name} className="w-10 h-10 rounded-full object-cover border border-slate-200" />
+                                </div>
+                              )}
+                            </div>
+                          );
+                        } else if (item.targetType === 'new_course') {
+                          return (
+                            <div className="space-y-1">
+                              <div><span className="font-medium">Code:</span> {parsed.code}</div>
+                              <div><span className="font-medium">Name:</span> {parsed.name}</div>
+                              <div className="line-clamp-3"><span className="font-medium">Description:</span> {parsed.description}</div>
+                            </div>
+                          );
+                        }
+                      } catch {
+                        return <span className="italic text-slate-500">Invalid suggestion details.</span>;
+                      }
+                    })()}
+                  </div>
                 ) : (
                   <p className="text-sm text-slate-600 mb-2 bg-slate-50 p-3 rounded-lg border border-slate-100">
                     "{item.details}"
