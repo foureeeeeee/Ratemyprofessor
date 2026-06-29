@@ -206,25 +206,33 @@ export default function App() {
       });
       if (error) {
         console.error("Supabase insert review error:", error);
+        setReviews(prev => prev.filter(r => r.id !== newReview.id));
       }
     } catch (error) {
       console.error("Error adding review:", error);
+      setReviews(prev => prev.filter(r => r.id !== newReview.id));
     }
   };
 
   const handleDeleteReview = async (id: string) => {
+    const reviewToDelete = reviews.find(r => r.id === id);
     setReviews(prev => prev.filter(r => r.id !== id));
     try {
-      await supabase.from('reviews').delete().eq('id', id);
+      const { error } = await supabase.from('reviews').delete().eq('id', id);
+      if (error) {
+        console.error("Supabase delete review error:", error);
+        if (reviewToDelete) setReviews(prev => [reviewToDelete, ...prev]);
+      }
     } catch (error) {
       console.error("Error deleting review:", error);
+      if (reviewToDelete) setReviews(prev => [reviewToDelete, ...prev]);
     }
   };
 
   const handleAddProfessor = async (newProfessor: Professor) => {
     setProfessors(prev => [newProfessor, ...prev]);
     try {
-      await supabase.from('professors').insert({
+      const { error } = await supabase.from('professors').insert({
         id: newProfessor.id,
         name: newProfessor.name,
         department: newProfessor.department,
@@ -233,15 +241,21 @@ export default function App() {
         average_rating: newProfessor.averageRating,
         review_count: newProfessor.reviewCount
       });
+      if (error) {
+        console.error("Supabase insert professor error:", error);
+        setProfessors(prev => prev.filter(p => p.id !== newProfessor.id));
+      }
     } catch (error) {
       console.error("Error adding professor:", error);
+      setProfessors(prev => prev.filter(p => p.id !== newProfessor.id));
     }
   };
 
   const handleUpdateProfessor = async (updatedProfessor: Professor) => {
+    const originalProfessor = professors.find(p => p.id === updatedProfessor.id);
     setProfessors(prev => prev.map(p => p.id === updatedProfessor.id ? updatedProfessor : p));
     try {
-      await supabase.from('professors').update({
+      const { error } = await supabase.from('professors').update({
         name: updatedProfessor.name,
         department: updatedProfessor.department,
         title: updatedProfessor.title,
@@ -249,24 +263,35 @@ export default function App() {
         average_rating: updatedProfessor.averageRating,
         review_count: updatedProfessor.reviewCount
       }).eq('id', updatedProfessor.id);
+      if (error) {
+        console.error("Supabase update professor error:", error);
+        if (originalProfessor) setProfessors(prev => prev.map(p => p.id === updatedProfessor.id ? originalProfessor : p));
+      }
     } catch (error) {
       console.error("Error updating professor:", error);
+      if (originalProfessor) setProfessors(prev => prev.map(p => p.id === updatedProfessor.id ? originalProfessor : p));
     }
   };
 
   const handleDeleteProfessor = async (id: string) => {
+    const professorToDelete = professors.find(p => p.id === id);
     setProfessors(prev => prev.filter(p => p.id !== id));
     try {
-      await supabase.from('professors').delete().eq('id', id);
+      const { error } = await supabase.from('professors').delete().eq('id', id);
+      if (error) {
+        console.error("Supabase delete professor error:", error);
+        if (professorToDelete) setProfessors(prev => [professorToDelete, ...prev]);
+      }
     } catch (error) {
       console.error("Error deleting professor:", error);
+      if (professorToDelete) setProfessors(prev => [professorToDelete, ...prev]);
     }
   };
 
   const handleAddCourse = async (newCourse: Course) => {
     setCourses(prev => [newCourse, ...prev]);
     try {
-      await supabase.from('courses').insert({
+      const { error } = await supabase.from('courses').insert({
         id: newCourse.id,
         code: newCourse.code,
         name: newCourse.name,
@@ -274,32 +299,49 @@ export default function App() {
         description: newCourse.description,
         professor_ids: newCourse.professorIds
       });
+      if (error) {
+        console.error("Supabase insert course error:", error);
+        setCourses(prev => prev.filter(c => c.id !== newCourse.id));
+      }
     } catch (error) {
       console.error("Error adding course:", error);
+      setCourses(prev => prev.filter(c => c.id !== newCourse.id));
     }
   };
 
   const handleUpdateCourse = async (updatedCourse: Course) => {
+    const originalCourse = courses.find(c => c.id === updatedCourse.id);
     setCourses(prev => prev.map(c => c.id === updatedCourse.id ? updatedCourse : c));
     try {
-      await supabase.from('courses').update({
+      const { error } = await supabase.from('courses').update({
         code: updatedCourse.code,
         name: updatedCourse.name,
         department: updatedCourse.department,
         description: updatedCourse.description,
         professor_ids: updatedCourse.professorIds
       }).eq('id', updatedCourse.id);
+      if (error) {
+        console.error("Supabase update course error:", error);
+        if (originalCourse) setCourses(prev => prev.map(c => c.id === updatedCourse.id ? originalCourse : c));
+      }
     } catch (error) {
       console.error("Error updating course:", error);
+      if (originalCourse) setCourses(prev => prev.map(c => c.id === updatedCourse.id ? originalCourse : c));
     }
   };
 
   const handleDeleteCourse = async (id: string) => {
+    const courseToDelete = courses.find(c => c.id === id);
     setCourses(prev => prev.filter(c => c.id !== id));
     try {
-      await supabase.from('courses').delete().eq('id', id);
+      const { error } = await supabase.from('courses').delete().eq('id', id);
+      if (error) {
+        console.error("Supabase delete course error:", error);
+        if (courseToDelete) setCourses(prev => [courseToDelete, ...prev]);
+      }
     } catch (error) {
       console.error("Error deleting course:", error);
+      if (courseToDelete) setCourses(prev => [courseToDelete, ...prev]);
     }
   };
 
@@ -313,7 +355,7 @@ export default function App() {
     };
     setReports(prev => [newReport, ...prev]);
     try {
-      await supabase.from('reports').insert({
+      const { error } = await supabase.from('reports').insert({
         id: newReport.id,
         target_id: newReport.targetId,
         target_type: newReport.targetType,
@@ -323,8 +365,13 @@ export default function App() {
         timestamp: newReport.timestamp,
         reporter_email: newReport.reporterEmail
       });
+      if (error) {
+        console.error("Supabase insert report error:", error);
+        setReports(prev => prev.filter(r => r.id !== newReport.id));
+      }
     } catch (error) {
       console.error("Error adding report:", error);
+      setReports(prev => prev.filter(r => r.id !== newReport.id));
     }
   };
 
