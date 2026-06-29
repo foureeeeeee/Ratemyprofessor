@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { ArrowRight, Search, BookOpen } from 'lucide-react';
 import { ParticlesBackground } from './ParticlesBackground';
 import { Professor, Course } from '../types';
+import AnimatedContent from './AnimatedContent';
 
 interface Props {
   professors?: Professor[];
@@ -53,7 +54,19 @@ export const Hero: React.FC<Props> = ({ professors = [], courses = [] }) => {
       {/* Subtle radial gradient to center content visually */}
       <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,transparent_0%,#f8fafc_90%)] pointer-events-none"></div>
       
-      <div className="relative z-10 max-w-4xl mx-auto px-6 text-center mt-[-4rem]">
+      <AnimatedContent
+        distance={150}
+        direction="vertical"
+        reverse={false}
+        duration={1.2}
+        ease="back.out(1.7)"
+        initialOpacity={0}
+        animateOpacity
+        scale={0.8}
+        threshold={0.1}
+        delay={0.2}
+        className="relative z-10 max-w-4xl mx-auto px-6 text-center mt-[-4rem]"
+      >
         <div className="inline-flex items-center justify-center mb-8">
           <div className="p-4 bg-white shadow-md border border-slate-200 rounded-full mx-auto align-middle">
              <BookOpen className="w-8 h-8 text-slate-800" />
@@ -102,7 +115,7 @@ export const Hero: React.FC<Props> = ({ professors = [], courses = [] }) => {
             Administrator Access &rarr;
           </Link>
         </div>
-      </div>
+      </AnimatedContent>
     </div>
   );
 };
