@@ -98,6 +98,56 @@ export default function App() {
           reporterEmail: r.reporter_email
         }));
 
+        // Auto-seed Supabase database if it is empty, to prevent foreign key errors when adding new data
+        if (mappedProfessors.length === 0) {
+          console.log("Seeding Supabase with initial mock data...");
+          try {
+            await supabase.from('professors').insert(MOCK_PROFESSORS.map(p => ({
+              id: p.id,
+              name: p.name,
+              department: p.department,
+              title: p.title,
+              image: p.image,
+              average_rating: p.averageRating,
+              review_count: p.reviewCount
+            })));
+            
+            await supabase.from('courses').insert(MOCK_COURSES.map(c => ({
+              id: c.id,
+              code: c.code,
+              name: c.name,
+              department: c.department,
+              description: c.description,
+              professor_ids: c.professorIds
+            })));
+            
+            await supabase.from('reviews').insert(MOCK_REVIEWS.map(r => ({
+              id: r.id,
+              professor_id: r.professorId,
+              student_name: r.studentName,
+              rating: r.rating,
+              difficulty: r.difficulty,
+              tags: r.tags,
+              comment: r.comment,
+              course_code: r.courseCode,
+              date: r.date,
+              clarity: r.clarity,
+              fairness: r.fairness,
+              communication: r.communication,
+              expertise: r.expertise,
+              approachability: r.approachability,
+              for_credit: r.forCredit,
+              attendance: r.attendance,
+              would_take_again: r.wouldTakeAgain,
+              grade: r.grade,
+              textbook_used: r.textbookUsed,
+              verified: r.verified
+            })));
+          } catch (seedError) {
+            console.error("Error auto-seeding database:", seedError);
+          }
+        }
+
         // Merge mock data with Supabase data to preserve initial mock state alongside new user-added data
         const mergedProfessors = [
           ...MOCK_PROFESSORS.filter(m => !mappedProfessors.some(p => p.id === m.id)), 
