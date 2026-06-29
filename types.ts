@@ -68,7 +68,7 @@ export interface SmpEnrollment {
 export interface Report {
   id: string;
   targetId: string;
-  targetType: 'review' | 'professor' | 'course';
+  targetType: 'review' | 'professor' | 'course' | 'new_professor' | 'new_course';
   reason: string;
   details: string;
   status: 'pending' | 'resolved' | 'dismissed';

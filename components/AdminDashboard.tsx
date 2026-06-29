@@ -320,7 +320,7 @@ export const AdminDashboard: React.FC<Props> = ({
             name: formData.get('name') as string,
             department: formData.get('department') as string,
             description: formData.get('description') as string,
-            professorIds: editingItem ? editingItem.professorIds : [] 
+            professorIds: formData.getAll('professorIds') as string[]
         };
         editingItem ? onUpdateCourse(course) : onAddCourse(course);
     }
@@ -337,7 +337,7 @@ export const AdminDashboard: React.FC<Props> = ({
     }
   };
 
-  const handleModerationAction = (report: Report, action: 'approve' | 'reject') => {
+  const handleModerationAction = (report: Report, action: 'approve' | 'reject' | 'approve_new') => {
     setResolutionData({ report, action });
     setAdminMessage('');
   };
@@ -349,6 +349,9 @@ export const AdminDashboard: React.FC<Props> = ({
     if (action === 'approve') {
       onResolveReport(report.id, 'dismiss', adminMessage);
     } 
+    else if (action === 'approve_new') {
+      onResolveReport(report.id, 'approve_new', adminMessage);
+    }
     else {
       onResolveReport(report.id, 'delete', adminMessage);
       if (report.targetType === 'review') onDeleteReview(report.targetId);
@@ -359,18 +362,26 @@ export const AdminDashboard: React.FC<Props> = ({
     setResolutionData(null);
   };
 
-  const getContentPreview = (targetId: string, type: string) => {
-    if (type === 'review') {
-      const r = reviews.find(rev => rev.id === targetId);
+  const getContentPreview = (report: Report) => {
+    if (report.targetType === 'review') {
+      const r = reviews.find(rev => rev.id === report.targetId);
       return r ? `"${r.comment}"` : "[Content deleted or not found]";
     }
-    if (type === 'professor') {
-      const p = professors.find(prof => prof.id === targetId);
+    if (report.targetType === 'professor') {
+      const p = professors.find(prof => prof.id === report.targetId);
       return p ? p.name : "[Professor not found]";
     }
-    if (type === 'course') {
-      const c = courses.find(course => course.id === targetId);
+    if (report.targetType === 'course') {
+      const c = courses.find(course => course.id === report.targetId);
       return c ? `${c.code} - ${c.name}` : "[Course not found]";
+    }
+    if (report.targetType === 'new_professor' || report.targetType === 'new_course') {
+      try {
+        const item = JSON.parse(report.details);
+        return report.targetType === 'new_professor' ? `New Professor: ${item.name} (${item.department})` : `New Course: ${item.code} - ${item.name}`;
+      } catch {
+        return "Invalid details JSON";
+      }
     }
     return "Unknown Content";
   };
@@ -624,24 +635,34 @@ export const AdminDashboard: React.FC<Props> = ({
                   {item.reporterEmail ? item.reporterEmail : <span className="italic">Anonymous</span>}
                 </div>
 
-                <div className="mt-auto pt-4 border-t border-slate-100">
+                  <div className="mt-auto pt-4 border-t border-slate-100">
                   <div className="text-xs font-bold text-slate-400 uppercase mb-2">Flagged Content</div>
                   <p className="text-sm text-slate-800 font-medium italic mb-6 line-clamp-3">
-                    {getContentPreview(item.targetId, item.targetType)}
+                    {getContentPreview(item)}
                   </p>
 
                   <div className="flex gap-2">
-                    <button 
-                      onClick={() => handleModerationAction(item, 'approve')}
-                      className="flex-1 flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-lg text-sm font-bold transition-colors"
-                      title="Keep Content (Dismiss Report)"
-                    >
-                      <Check className="w-4 h-4" /> Approve
-                    </button>
+                    {item.targetType === 'new_professor' || item.targetType === 'new_course' ? (
+                      <button 
+                        onClick={() => handleModerationAction(item, 'approve_new')}
+                        className="flex-1 flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg text-sm font-bold transition-colors"
+                        title="Approve Suggestion and Add to System"
+                      >
+                        <Check className="w-4 h-4" /> Approve & Add
+                      </button>
+                    ) : (
+                      <button 
+                        onClick={() => handleModerationAction(item, 'approve')}
+                        className="flex-1 flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-lg text-sm font-bold transition-colors"
+                        title="Keep Content (Dismiss Report)"
+                      >
+                        <Check className="w-4 h-4" /> Dismiss Report
+                      </button>
+                    )}
                     <button 
                       onClick={() => handleModerationAction(item, 'reject')}
                       className="flex-1 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg text-sm font-bold transition-colors"
-                      title="Delete Content (Resolve Report)"
+                      title={item.targetType === 'new_professor' || item.targetType === 'new_course' ? "Reject Suggestion" : "Delete Content (Resolve Report)"}
                     >
                       <XCircle className="w-4 h-4" /> Reject
                     </button>
@@ -825,6 +846,26 @@ export const AdminDashboard: React.FC<Props> = ({
                     <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
                     <textarea name="description" defaultValue={editingItem?.description} rows={3} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none" />
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Linked Instructors</label>
+                    <div className="max-h-48 overflow-y-auto border border-slate-300 rounded-lg p-2 space-y-2 bg-slate-50">
+                      {professors.map(p => (
+                        <label key={p.id} className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+                          <input 
+                            type="checkbox" 
+                            name="professorIds" 
+                            value={p.id} 
+                            defaultChecked={editingItem?.professorIds?.includes(p.id)}
+                            className="rounded border-slate-300 text-blue-600 focus:ring-blue-500" 
+                          />
+                          {p.name} ({p.department})
+                        </label>
+                      ))}
+                      {professors.length === 0 && (
+                        <div className="text-slate-500 italic p-2 text-sm">No instructors available.</div>
+                      )}
+                    </div>
+                  </div>
                 </>
               )}
 
@@ -881,10 +922,11 @@ export const AdminDashboard: React.FC<Props> = ({
              
              <div className="p-6">
                <p className="text-sm text-slate-600 mb-4">
-                 You are about to <span className={`font-bold uppercase ${resolutionData.action === 'approve' ? 'text-green-600' : 'text-red-600'}`}>
-                   {resolutionData.action}
+                 You are about to <span className={`font-bold uppercase ${resolutionData.action === 'reject' ? 'text-red-600' : 'text-emerald-600'}`}>
+                   {resolutionData.action === 'approve_new' ? 'Approve & Add' : resolutionData.action}
                  </span> this report.
                  {resolutionData.action === 'reject' && " This will remove the reported content permanently."}
+                 {resolutionData.action === 'approve_new' && " This will add the new item to the database."}
                </p>
 
                <div className="mb-6">
@@ -911,7 +953,7 @@ export const AdminDashboard: React.FC<Props> = ({
                  <button 
                     onClick={confirmResolution}
                     className={`px-4 py-2 text-white rounded-lg font-medium shadow-md flex items-center gap-2 ${
-                      resolutionData.action === 'approve' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'
+                      resolutionData.action === 'reject' ? 'bg-red-600 hover:bg-red-700' : 'bg-emerald-600 hover:bg-emerald-700'
                     }`}
                  >
                    <Send className="w-4 h-4" /> Confirm & Notify

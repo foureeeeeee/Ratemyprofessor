@@ -395,7 +395,77 @@ export default function App() {
     }
   };
 
-  // --- Reporting Handlers ---
+  const handleSuggestProfessor = async (newProfessor: Professor) => {
+    const newReport: Report = {
+      id: crypto.randomUUID(),
+      targetId: newProfessor.id,
+      targetType: 'new_professor',
+      reason: 'User Suggested Professor',
+      details: JSON.stringify(newProfessor),
+      status: 'pending',
+      timestamp: new Date().toISOString(),
+      reporterEmail: currentUser?.email
+    };
+    
+    setReports(prev => [newReport, ...prev]);
+    try {
+      const { error } = await supabase.from('reports').insert({
+        id: newReport.id,
+        target_id: newReport.targetId,
+        target_type: newReport.targetType,
+        reason: newReport.reason,
+        details: newReport.details,
+        status: newReport.status,
+        timestamp: newReport.timestamp,
+        reporter_email: newReport.reporterEmail
+      });
+      if (error) {
+        console.error("Supabase insert report error:", error);
+        setReports(prev => prev.filter(r => r.id !== newReport.id));
+      } else {
+        alert("Thank you! Your professor suggestion has been submitted for admin approval.");
+      }
+    } catch (error) {
+      console.error("Error adding report:", error);
+      setReports(prev => prev.filter(r => r.id !== newReport.id));
+    }
+  };
+
+  const handleSuggestCourse = async (newCourse: Course) => {
+    const newReport: Report = {
+      id: crypto.randomUUID(),
+      targetId: newCourse.id,
+      targetType: 'new_course',
+      reason: 'User Suggested Course',
+      details: JSON.stringify(newCourse),
+      status: 'pending',
+      timestamp: new Date().toISOString(),
+      reporterEmail: currentUser?.email
+    };
+    
+    setReports(prev => [newReport, ...prev]);
+    try {
+      const { error } = await supabase.from('reports').insert({
+        id: newReport.id,
+        target_id: newReport.targetId,
+        target_type: newReport.targetType,
+        reason: newReport.reason,
+        details: newReport.details,
+        status: newReport.status,
+        timestamp: newReport.timestamp,
+        reporter_email: newReport.reporterEmail
+      });
+      if (error) {
+        console.error("Supabase insert report error:", error);
+        setReports(prev => prev.filter(r => r.id !== newReport.id));
+      } else {
+        alert("Thank you! Your course suggestion has been submitted for admin approval.");
+      }
+    } catch (error) {
+      console.error("Error adding report:", error);
+      setReports(prev => prev.filter(r => r.id !== newReport.id));
+    }
+  };
   const handleReportContent = async (report: Omit<Report, 'id' | 'status' | 'timestamp'>) => {
     const newReport: Report = {
       ...report,
@@ -425,15 +495,31 @@ export default function App() {
     }
   };
 
-  const handleResolveReport = async (reportId: string, action: 'dismiss' | 'delete', adminMessage?: string) => {
+  const handleResolveReport = async (reportId: string, action: 'dismiss' | 'delete' | 'approve_new', adminMessage?: string) => {
     const report = reports.find(r => r.id === reportId);
+    
+    if (report && action === 'approve_new') {
+      try {
+        const itemData = JSON.parse(report.details);
+        if (report.targetType === 'new_professor') {
+          await handleAddProfessor(itemData);
+        } else if (report.targetType === 'new_course') {
+          await handleAddCourse(itemData);
+        }
+      } catch (err) {
+        console.error("Error adding approved item:", err);
+      }
+    }
     
     // Notify User
     if (report && report.reporterEmail) {
-      const resolution = action === 'dismiss' ? 'Approved (Report Dismissed)' : 'Rejected (Content Removed)';
+      let resolution = '';
+      if (action === 'dismiss') resolution = 'Approved (Report Dismissed)';
+      else if (action === 'delete') resolution = 'Rejected (Content Removed)';
+      else if (action === 'approve_new') resolution = 'Approved (Suggestion Accepted)';
       
-      const subject = encodeURIComponent(`Update on your report regarding ${report.targetType}`);
-      let bodyText = `Your report has been reviewed by our administration team.\n\n`;
+      const subject = encodeURIComponent(`Update on your submission regarding ${report.targetType}`);
+      let bodyText = `Your submission has been reviewed by our administration team.\n\n`;
       bodyText += `Resolution: ${resolution}\n`;
       
       if (adminMessage) {
@@ -524,7 +610,7 @@ export default function App() {
                 <ProfessorList 
                   professors={professors} 
                   reviews={reviews} 
-                  onAddProfessor={handleAddProfessor}
+                  onAddProfessor={handleSuggestProfessor}
                   currentUser={currentUser}
                   onRequireLogin={handleRequireLogin}
                 />
@@ -537,7 +623,7 @@ export default function App() {
                   courses={courses}
                   professors={professors} 
                   reviews={reviews} 
-                  onAddCourse={handleAddCourse}
+                  onAddCourse={handleSuggestCourse}
                   currentUser={currentUser}
                   onRequireLogin={handleRequireLogin}
                 />
