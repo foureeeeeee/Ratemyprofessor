@@ -56,6 +56,8 @@ export const ParticlesBackground: React.FC<Props> = ({
       vy: number;
       size: number;
       color: string;
+      type: 'dot' | 'star' | 'grade' | 'tick';
+      symbol: string;
 
       constructor() {
         this.x = Math.random() * canvas.width;
@@ -64,6 +66,25 @@ export const ParticlesBackground: React.FC<Props> = ({
         this.vy = (Math.random() - 0.5) * baseSpeed;
         this.size = Math.random() * 2 + 0.5; // Small circles
         this.color = particleColor;
+
+        const rand = Math.random();
+        if (rand < 0.5) {
+          this.type = 'dot';
+          this.symbol = '';
+        } else if (rand < 0.7) {
+          this.type = 'star';
+          this.symbol = '★';
+          this.size = Math.random() * 4 + 7; // readable size
+        } else if (rand < 0.88) {
+          this.type = 'grade';
+          const grades = ['A+', 'A', 'A-', 'B+', 'B', 'PASS'];
+          this.symbol = grades[Math.floor(Math.random() * grades.length)];
+          this.size = Math.random() * 4 + 8;
+        } else {
+          this.type = 'tick';
+          this.symbol = '✓';
+          this.size = Math.random() * 3 + 8;
+        }
       }
 
       update() {
@@ -93,10 +114,25 @@ export const ParticlesBackground: React.FC<Props> = ({
 
       draw() {
         if (!ctx) return;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
-        ctx.fill();
+        if (this.type === 'dot') {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fillStyle = this.color;
+          ctx.fill();
+        } else {
+          ctx.save();
+          ctx.fillStyle = this.color;
+          ctx.globalAlpha = 0.35; // keep it subtle in the background
+          if (this.type === 'star') {
+            ctx.font = `${this.size}px serif`;
+          } else {
+            ctx.font = `500 ${this.size}px system-ui, sans-serif`;
+          }
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(this.symbol, this.x, this.y);
+          ctx.restore();
+        }
       }
     }
 

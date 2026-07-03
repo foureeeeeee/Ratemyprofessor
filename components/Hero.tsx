@@ -73,13 +73,15 @@ export const Hero: React.FC<Props> = ({ professors = [], courses = [] }) => {
           </div>
         </div>
         
-        <h1 className="text-5xl md:text-7xl font-serif font-bold text-slate-900 mb-6 tracking-tight leading-tight">
-          Universiti Kebangsaan Malaysia <br className="hidden md:block" />
-          <span className="text-slate-600 italic font-medium">Academic Review Index</span>
+        <p className="text-sm md:text-base uppercase tracking-[0.2em] font-bold text-slate-500 mb-3">
+          Universiti Kebangsaan Malaysia
+        </p>
+        <h1 className="text-5xl md:text-7xl font-serif text-slate-900 mb-6 tracking-tight leading-tight">
+          <span className="italic font-medium">Academic Review Index</span>
         </h1>
 
-        <p className="text-slate-600 text-lg md:text-xl max-w-2xl mx-auto mb-12 font-medium leading-relaxed">
-          Access verified course and instructor evaluations. Empowering students with transparent academic insights to make informed enrollment decisions.
+        <p className="text-slate-600 text-sm md:text-base max-w-xl mx-auto mb-10 font-normal leading-relaxed">
+          Verified course and instructor evaluations from real UKM students.
         </p>
         
         {/* Search Box */}
@@ -102,6 +104,15 @@ export const Hero: React.FC<Props> = ({ professors = [], courses = [] }) => {
               Search <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" strokeWidth={2.5} />
             </button>
           </form>
+        </div>
+
+        {/* Lightweight Stats Row */}
+        <div className="mt-4 flex justify-center items-center gap-3 text-xs md:text-sm font-medium text-slate-400 select-none">
+          <span>49,000+ Students</span>
+          <span className="text-slate-300 font-bold">•</span>
+          <span>13 Faculties</span>
+          <span className="text-slate-300 font-bold">•</span>
+          <span>Est. 1970</span>
         </div>
 
         <div className="mt-16 flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-500">

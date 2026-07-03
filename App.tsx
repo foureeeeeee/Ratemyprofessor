@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Navbar } from './components/Navbar';
+import { AnimatePresence } from 'motion/react';
+import { CardNav } from './components/CardNav';
 import { Hero } from './components/Hero';
 import { ProfessorList } from './components/ProfessorList';
 import { CourseList } from './components/CourseList';
@@ -17,6 +18,35 @@ import { Professor, Review, Course, User, Report } from './types';
 import { Loader2, BookOpenCheck } from 'lucide-react';
 import { supabase } from './services/supabase';
 
+const STATIC_NAV_ITEMS = [
+  {
+    label: "Academic",
+    bgColor: "#003366", // Navy Blue
+    textColor: "#ffffff",
+    links: [
+      { label: "Faculty Directory", href: "/professors", ariaLabel: "Faculty Directory" },
+      { label: "Courses Catalog", href: "/courses", ariaLabel: "Courses Catalog" }
+    ]
+  },
+  {
+    label: "Personal",
+    bgColor: "#1e293b", // Slate-800
+    textColor: "#ffffff",
+    links: [
+      { label: "My Learning", href: "/my-courses", ariaLabel: "My Learning Dashboard" },
+      { label: "Analytics", href: "/dashboard", ariaLabel: "System Analytics" }
+    ]
+  },
+  {
+    label: "Administrator",
+    bgColor: "#990000", // Classic Academic Red
+    textColor: "#ffffff",
+    links: [
+      { label: "Admin Console", href: "/admin/login", ariaLabel: "Administrator Login" }
+    ]
+  }
+];
+
 export default function App() {
   // Centralized state to simulate a database
   const [professors, setProfessors] = useState<Professor[]>([]);
@@ -27,6 +57,7 @@ export default function App() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isNavExpanded, setIsNavExpanded] = useState(false);
 
   // Fetch data from Supabase
   useEffect(() => {
@@ -593,15 +624,29 @@ export default function App() {
 
   return (
     <HashRouter>
-      <div className="min-h-screen flex flex-col font-sans text-slate-800 bg-slate-50 relative">
+      <div className="min-h-screen flex flex-col font-sans text-slate-800 bg-slate-50 relative animate-fade-in">
         
-        <Navbar 
+        {/* Blur overlay for the body of the page when the menu is expanded */}
+        <div 
+          className={`fixed inset-0 bg-slate-950/30 backdrop-blur-sm transition-opacity duration-300 z-[90] will-change-[opacity,backdrop-filter] ${
+            isNavExpanded ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
+        />
+
+        <CardNav 
           currentUser={currentUser} 
           onTriggerLogin={handleRequireLogin} 
           onLogout={handleStudentLogout}
+          items={STATIC_NAV_ITEMS}
+          baseColor={currentUser ? "#0f172a" : "#ffffff"}
+          menuColor={currentUser ? "#ffffff" : "#1e293b"}
+          buttonBgColor={currentUser ? "#334155" : "#003366"}
+          buttonTextColor="#ffffff"
+          ease="power3.out"
+          onExpandedChange={setIsNavExpanded}
         />
         
-        <main className="flex-grow relative z-10">
+        <main className="flex-grow relative z-10 pt-28">
           <Routes>
             <Route path="/" element={<Hero professors={professors} courses={courses} />} />
             <Route 
@@ -700,12 +745,14 @@ export default function App() {
           </Routes>
         </main>
         
-        {isLoginModalOpen && (
-          <StudentLoginModal 
-            onClose={() => setIsLoginModalOpen(false)}
-            onLogin={handleStudentLogin}
-          />
-        )}
+        <AnimatePresence>
+          {isLoginModalOpen && (
+            <StudentLoginModal 
+              onClose={() => setIsLoginModalOpen(false)}
+              onLogin={handleStudentLogin}
+            />
+          )}
+        </AnimatePresence>
 
         <footer className="bg-white border-t border-slate-200 text-slate-500 py-8 relative z-10">
           <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">

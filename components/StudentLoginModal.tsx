@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, ShieldCheck, X, ArrowRight, Loader2, FileText, Lock } from 'lucide-react';
+import { motion } from 'motion/react';
 import { supabase } from '../services/supabase'; // Import your configured Supabase client
 
 interface Props {
@@ -86,8 +87,20 @@ export const StudentLoginModal: React.FC<Props> = ({ onClose, onLogin }) => {
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-white/60 animate-in zoom-in-95 duration-300 relative h-[600px] flex flex-col">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.25 }}
+      className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-md"
+    >
+      <motion.div 
+        initial={{ scale: 0.95, y: 15, opacity: 0 }}
+        animate={{ scale: 1, y: 0, opacity: 1 }}
+        exit={{ scale: 0.95, y: 15, opacity: 0 }}
+        transition={{ type: "spring", damping: 25, stiffness: 350 }}
+        className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-white/40 relative h-[600px] flex flex-col"
+      >
         
         {/* TOS Overlay */}
         {showTOS && (
@@ -219,7 +232,7 @@ export const StudentLoginModal: React.FC<Props> = ({ onClose, onLogin }) => {
             </p>
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
