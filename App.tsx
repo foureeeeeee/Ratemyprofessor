@@ -610,6 +610,21 @@ export default function App() {
     }
   };
 
+  const [currentHash, setCurrentHash] = useState(window.location.hash);
+  useEffect(() => {
+    const handleHashChange = () => {
+      setCurrentHash(window.location.hash);
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    const interval = setInterval(handleHashChange, 100);
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+      clearInterval(interval);
+    };
+  }, []);
+
+  const isHomePage = !currentHash || currentHash === '#/' || currentHash === '#';
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 text-slate-800 font-sans">
@@ -624,7 +639,7 @@ export default function App() {
 
   return (
     <HashRouter>
-      <div className="min-h-screen flex flex-col font-sans text-slate-800 bg-slate-50 relative animate-fade-in">
+      <div className={`${isHomePage ? 'h-screen overflow-hidden' : 'min-h-screen'} flex flex-col font-sans text-slate-800 bg-slate-50 relative animate-fade-in`}>
         
         {/* Blur overlay for the body of the page when the menu is expanded */}
         <div 
@@ -754,19 +769,21 @@ export default function App() {
           )}
         </AnimatePresence>
 
-        <footer className="bg-white border-t border-slate-200 text-slate-500 py-8 relative z-10">
-          <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="text-center md:text-left">
-               <p className="font-serif font-bold text-slate-900">Universiti Kebangsaan Malaysia</p>
-               <p className="text-xs mt-1">Management Information System &copy; 2025</p>
+        {!isHomePage && (
+          <footer className="bg-white border-t border-slate-200 text-slate-500 py-8 relative z-10">
+            <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+              <div className="text-center md:text-left">
+                 <p className="font-serif font-bold text-slate-900">Universiti Kebangsaan Malaysia</p>
+                 <p className="text-xs mt-1">Management Information System &copy; 2025</p>
+              </div>
+              <div className="text-xs">
+                <span className="hover:text-blue-700 cursor-pointer transition-colors">Privacy Policy</span>
+                <span className="mx-2">•</span>
+                <span className="hover:text-blue-700 cursor-pointer transition-colors">Terms of Service</span>
+              </div>
             </div>
-            <div className="text-xs">
-              <span className="hover:text-blue-700 cursor-pointer transition-colors">Privacy Policy</span>
-              <span className="mx-2">•</span>
-              <span className="hover:text-blue-700 cursor-pointer transition-colors">Terms of Service</span>
-            </div>
-          </div>
-        </footer>
+          </footer>
+        )}
       </div>
     </HashRouter>
   );
