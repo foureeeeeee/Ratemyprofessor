@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowRight, Search, BookOpen, ChevronDown } from 'lucide-react';
 import { ParticlesBackground } from './ParticlesBackground';
@@ -9,11 +9,47 @@ import { WhyItMatters } from './WhyItMatters';
 interface Props {
   professors?: Professor[];
   courses?: Course[];
+  onNavbarThemeChange?: (theme: 'light' | 'dark') => void;
+  onOpenPrivacy?: () => void;
+  onOpenTerms?: () => void;
 }
 
-export const Hero: React.FC<Props> = ({ professors = [], courses = [] }) => {
+export const Hero: React.FC<Props> = ({ 
+  professors = [], 
+  courses = [], 
+  onNavbarThemeChange,
+  onOpenPrivacy,
+  onOpenTerms
+}) => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const target = containerRef.current;
+      if (target) {
+        // If scrolled down past 40% of the first section, change theme to dark
+        const threshold = target.clientHeight * 0.4;
+        if (target.scrollTop > threshold) {
+          onNavbarThemeChange?.('dark');
+        } else {
+          onNavbarThemeChange?.('light');
+        }
+      }
+    };
+
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+    }
+    return () => {
+      if (container) {
+        container.removeEventListener('scroll', handleScroll);
+      }
+      onNavbarThemeChange?.('light');
+    };
+  }, [onNavbarThemeChange]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +80,7 @@ export const Hero: React.FC<Props> = ({ professors = [], courses = [] }) => {
   };
 
   return (
-    <div className="h-[calc(100vh-7rem)] overflow-y-auto snap-y snap-mandatory scroll-smooth relative bg-slate-50">
+    <div ref={containerRef} className="h-[calc(100vh-7rem)] overflow-y-auto snap-y snap-mandatory scroll-smooth relative bg-slate-50">
       {/* Search & Hero Screen */}
       <div className="relative overflow-hidden h-full min-h-[550px] flex items-center justify-center pb-12 snap-start shrink-0">
         <div className="absolute inset-0 z-0 opacity-100 mix-blend-multiply">
@@ -84,7 +120,7 @@ export const Hero: React.FC<Props> = ({ professors = [], courses = [] }) => {
             Universiti Kebangsaan Malaysia
           </p>
           <h1 className="text-5xl md:text-7xl font-serif text-slate-900 mb-6 tracking-tight leading-tight">
-            <span className="italic font-medium">Academic Review Index</span>
+            <span className="italic font-medium">Rate My Professor</span>
           </h1>
 
           <p className="text-slate-600 text-sm md:text-base max-w-xl mx-auto mb-10 font-normal leading-relaxed">
@@ -92,23 +128,24 @@ export const Hero: React.FC<Props> = ({ professors = [], courses = [] }) => {
           </p>
           
           {/* Search Box */}
-          <div className="max-w-3xl mx-auto bg-white/95 backdrop-blur-md p-2 rounded-2xl shadow-2xl shadow-slate-200/50 border border-slate-300 focus-within:ring-4 focus-within:ring-slate-900/5 focus-within:border-slate-400 transition-all duration-300 group">
+          <div className="max-w-2xl mx-auto bg-white/95 backdrop-blur-md p-1.5 rounded-xl shadow-xl shadow-slate-200/40 border border-slate-200 focus-within:ring-4 focus-within:ring-slate-900/5 focus-within:border-slate-400 transition-all duration-300 group">
             <form onSubmit={handleSearch} className="relative flex items-center">
-              <div className="pl-6 pr-4 text-slate-400">
-                <Search className="w-6 h-6 group-focus-within:animate-pulse group-focus-within:text-slate-900 transition-colors" strokeWidth={2} />
+              <div className="pl-4 pr-2 text-slate-400">
+                <Search className="w-5 h-5 group-focus-within:animate-pulse group-focus-within:text-slate-900 transition-colors" strokeWidth={2} />
               </div>
               <input 
+                id="hero-search-input"
                 type="text" 
-                className="w-full h-14 bg-transparent text-slate-900 outline-none font-sans text-xl placeholder:text-slate-400 font-medium"
+                className="w-full h-11 bg-transparent text-slate-900 outline-none font-sans text-sm md:text-base placeholder:text-slate-400 font-medium"
                 placeholder="Search faculty, courses, or departments..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
               <button 
                 type="submit"
-                className="h-14 px-8 bg-slate-900 text-white rounded-xl font-bold text-lg hover:bg-slate-800 focus:ring-4 focus:ring-slate-900/20 transition-all shadow-md flex items-center gap-2 pr-8 ml-2 whitespace-nowrap group/btn"
+                className="h-11 px-5 bg-slate-900 text-white rounded-lg font-bold text-sm md:text-base hover:bg-slate-800 focus:ring-4 focus:ring-slate-900/20 transition-all shadow-md flex items-center gap-1.5 ml-1.5 pr-5 whitespace-nowrap group/btn"
               >
-                Search <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" strokeWidth={2.5} />
+                Search <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" strokeWidth={2.5} />
               </button>
             </form>
           </div>
@@ -158,9 +195,9 @@ export const Hero: React.FC<Props> = ({ professors = [], courses = [] }) => {
              <p className="text-xs mt-1">Management Information System &copy; 2025</p>
           </div>
           <div className="text-xs">
-            <span className="hover:text-blue-400 cursor-pointer transition-colors">Privacy Policy</span>
+            <span onClick={onOpenPrivacy} className="hover:text-blue-400 cursor-pointer transition-colors">Privacy Policy</span>
             <span className="mx-2">•</span>
-            <span className="hover:text-blue-400 cursor-pointer transition-colors">Terms of Service</span>
+            <span onClick={onOpenTerms} className="hover:text-blue-400 cursor-pointer transition-colors">Terms of Service</span>
           </div>
         </div>
       </footer>

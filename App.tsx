@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AnimatePresence } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import { CardNav } from './components/CardNav';
 import { Hero } from './components/Hero';
 import { ProfessorList } from './components/ProfessorList';
@@ -15,7 +15,7 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { StudentLoginModal } from './components/StudentLoginModal';
 import { MOCK_PROFESSORS, MOCK_REVIEWS, MOCK_COURSES } from './constants';
 import { Professor, Review, Course, User, Report } from './types';
-import { Loader2, BookOpenCheck } from 'lucide-react';
+import { Loader2, BookOpenCheck, X, Shield, FileText } from 'lucide-react';
 import { supabase } from './services/supabase';
 
 const STATIC_NAV_ITEMS = [
@@ -611,6 +611,9 @@ export default function App() {
   };
 
   const [currentHash, setCurrentHash] = useState(window.location.hash);
+  const [navbarTheme, setNavbarTheme] = useState<'light' | 'dark'>('light');
+  const [policyType, setPolicyType] = useState<'privacy' | 'terms' | null>(null);
+
   useEffect(() => {
     const handleHashChange = () => {
       setCurrentHash(window.location.hash);
@@ -639,7 +642,7 @@ export default function App() {
 
   return (
     <HashRouter>
-      <div className={`${isHomePage ? 'h-screen overflow-hidden' : 'min-h-screen'} flex flex-col font-sans text-slate-800 bg-slate-50 relative animate-fade-in`}>
+      <div className={`${isHomePage ? 'h-screen overflow-hidden' : 'min-h-screen'} flex flex-col font-sans text-slate-800 ${isHomePage && navbarTheme === 'dark' ? 'bg-slate-950' : 'bg-slate-50'} relative animate-fade-in transition-colors duration-500`}>
         
         {/* Blur overlay for the body of the page when the menu is expanded */}
         <div 
@@ -653,17 +656,25 @@ export default function App() {
           onTriggerLogin={handleRequireLogin} 
           onLogout={handleStudentLogout}
           items={STATIC_NAV_ITEMS}
-          baseColor={currentUser ? "#0f172a" : "#ffffff"}
-          menuColor={currentUser ? "#ffffff" : "#1e293b"}
-          buttonBgColor={currentUser ? "#334155" : "#003366"}
+          baseColor={currentUser ? "#0f172a" : (navbarTheme === 'dark' ? "#020617" : "#ffffff")}
+          menuColor={currentUser ? "#ffffff" : (navbarTheme === 'dark' ? "#ffffff" : "#1e293b")}
+          buttonBgColor={currentUser ? "#334155" : (navbarTheme === 'dark' ? "#1e293b" : "#003366")}
           buttonTextColor="#ffffff"
           ease="power3.out"
           onExpandedChange={setIsNavExpanded}
         />
         
-        <main className="flex-grow relative z-10 pt-28">
+        <main className={`flex-grow relative z-10 pt-28 transition-colors duration-500 ${isHomePage && navbarTheme === 'dark' ? 'bg-slate-950 text-white' : 'bg-transparent text-slate-800'}`}>
           <Routes>
-            <Route path="/" element={<Hero professors={professors} courses={courses} />} />
+            <Route path="/" element={
+              <Hero 
+                professors={professors} 
+                courses={courses} 
+                onNavbarThemeChange={setNavbarTheme} 
+                onOpenPrivacy={() => setPolicyType('privacy')}
+                onOpenTerms={() => setPolicyType('terms')}
+              />
+            } />
             <Route 
               path="/professors" 
               element={
@@ -767,6 +778,149 @@ export default function App() {
               onLogin={handleStudentLogin}
             />
           )}
+
+          {policyType && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md"
+            >
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95, y: 15 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 15 }}
+                transition={{ type: "spring", duration: 0.4, bounce: 0.15 }}
+                className="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden"
+              >
+                
+                {/* Modal Header */}
+                <div className="px-6 py-5 bg-slate-50 border-b border-slate-200 flex items-center justify-between shrink-0">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 bg-blue-50 text-blue-700 rounded-xl">
+                      {policyType === 'privacy' ? <Shield className="w-6 h-6 animate-pulse" /> : <FileText className="w-6 h-6 animate-pulse" />}
+                    </div>
+                    <div>
+                      <h3 className="font-serif text-xl font-bold text-slate-900">
+                        {policyType === 'privacy' ? 'Privacy Policy' : 'Terms of Service'}
+                      </h3>
+                      <p className="text-xs text-slate-400 font-medium mt-0.5">Last updated: July 2026</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setPolicyType(null)}
+                    className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Modal Content */}
+                <div className="p-6 overflow-y-auto font-sans text-sm text-slate-600 leading-relaxed space-y-6">
+                  {policyType === 'privacy' ? (
+                    <>
+                      <div>
+                        <h4 className="font-bold text-slate-800 text-base mb-1.5 flex items-center gap-2">
+                          <span className="w-1.5 h-6 bg-blue-600 rounded-full inline-block"></span>
+                          1. verified Siswa identity protection
+                        </h4>
+                        <p className="pl-3.5">
+                          Our system strictly uses <strong>siswa.ukm.edu.my</strong> account verification to authenticate active students. We do not store your name or ID alongside your published reviews. We believe in providing an honest space where constructive comments are fully anonymous to preserve academic review integrity.
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-800 text-base mb-1.5 flex items-center gap-2">
+                          <span className="w-1.5 h-6 bg-blue-600 rounded-full inline-block"></span>
+                          2. Data Security & Storage
+                        </h4>
+                        <p className="pl-3.5">
+                          Your student email is encrypted and securely stored on our server database only for verification constraints. Reviews, courses, and department metrics are kept up to date using secure Cloud SQL infrastructures. We will never sell, lease, or distribute student telemetry data to external third parties.
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-800 text-base mb-1.5 flex items-center gap-2">
+                          <span className="w-1.5 h-6 bg-blue-600 rounded-full inline-block"></span>
+                          3. Telemetry and Cookies
+                        </h4>
+                        <p className="pl-3.5">
+                          We use local session tokens to persist your verified student session so you do not need to sign in every time. We do not use persistent tracking cookies, ad networks, or external analytics integrations.
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-800 text-base mb-1.5 flex items-center gap-2">
+                          <span className="w-1.5 h-6 bg-blue-600 rounded-full inline-block"></span>
+                          4. Your Rights
+                        </h4>
+                        <p className="pl-3.5">
+                          You have full control over the reviews you post. At any time, you can edit, update, or remove your academic reviews from your personal 'My Learning' dashboard.
+                        </p>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div>
+                        <h4 className="font-bold text-slate-800 text-base mb-1.5 flex items-center gap-2">
+                          <span className="w-1.5 h-6 bg-amber-600 rounded-full inline-block"></span>
+                          1. Acceptable Usage Guidelines
+                        </h4>
+                        <p className="pl-3.5">
+                          The UKM Rate My Professor is a peer platform designed for constructive educational evaluations. Users are required to submit reviews that are factual, respectful, and educational. Vulgarity, personal abuse, or targeted harassment of any member of the university community is strictly prohibited.
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-800 text-base mb-1.5 flex items-center gap-2">
+                          <span className="w-1.5 h-6 bg-amber-600 rounded-full inline-block"></span>
+                          2. Review Moderation & Deletions
+                        </h4>
+                        <p className="pl-3.5">
+                          To maintain high-quality academic data, our student moderators and administrators reserve the right to review, edit, or delete any content that contains false claims, hate speech, or violates Universiti Kebangsaan Malaysia student code of ethics.
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-800 text-base mb-1.5 flex items-center gap-2">
+                          <span className="w-1.5 h-6 bg-amber-600 rounded-full inline-block"></span>
+                          3. Honest Rating Limitation
+                        </h4>
+                        <p className="pl-3.5">
+                          You may only review courses you have personally attended or instructors who have taught you. Artificially manipulating rankings using multi-account automation or malicious spamming is a direct breach of these terms.
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-800 text-base mb-1.5 flex items-center gap-2">
+                          <span className="w-1.5 h-6 bg-amber-600 rounded-full inline-block"></span>
+                          4. Academic Disclaimer
+                        </h4>
+                        <p className="pl-3.5">
+                          Ratings, feedback paragraphs, and department recommendations represent the subjective, compiled opinions of UKM students and do not represent official statements or policies of the Universiti Kebangsaan Malaysia administration.
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-800 text-base mb-1.5 flex items-center gap-2">
+                          <span className="w-1.5 h-6 bg-amber-600 rounded-full inline-block"></span>
+                          5. Simulated Data & Research Analytics
+                        </h4>
+                        <p className="pl-3.5 text-slate-600 leading-relaxed">
+                          The statistical data and analytics presented within the &quot;Why Rate My Professor Matters&quot; interactive visualizations are simulated based on interviews, questionnaires, and online research conducted to showcase general educational trends and platform impact.
+                        </p>
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Modal Footer */}
+                <div className="px-6 py-4 bg-slate-50 border-t border-slate-150 flex justify-end shrink-0">
+                  <button
+                    onClick={() => setPolicyType(null)}
+                    className="px-6 py-2.5 bg-slate-900 text-white font-semibold rounded-xl hover:bg-slate-800 transition-all focus:ring-4 focus:ring-slate-900/10 shadow-sm text-sm"
+                  >
+                    Acknowledge & Close
+                  </button>
+                </div>
+
+              </motion.div>
+            </motion.div>
+          )}
         </AnimatePresence>
 
         {!isHomePage && (
@@ -777,9 +931,9 @@ export default function App() {
                  <p className="text-xs mt-1">Management Information System &copy; 2025</p>
               </div>
               <div className="text-xs">
-                <span className="hover:text-blue-700 cursor-pointer transition-colors">Privacy Policy</span>
+                <span onClick={() => setPolicyType('privacy')} className="hover:text-blue-700 cursor-pointer transition-colors">Privacy Policy</span>
                 <span className="mx-2">•</span>
-                <span className="hover:text-blue-700 cursor-pointer transition-colors">Terms of Service</span>
+                <span onClick={() => setPolicyType('terms')} className="hover:text-blue-700 cursor-pointer transition-colors">Terms of Service</span>
               </div>
             </div>
           </footer>

@@ -56,7 +56,7 @@ export const CardNav: React.FC<CardNavProps> = ({
   const tlRef = useRef<gsap.core.Timeline | null>(null);
 
   // Detect dark base color for dynamic high-contrast UI theming
-  const isDarkBase = baseColor === '#0f172a' || baseColor === '#111827' || baseColor === '#003366' || baseColor === '#1e293b';
+  const isDarkBase = baseColor === '#0f172a' || baseColor === '#111827' || baseColor === '#003366' || baseColor === '#1e293b' || baseColor === '#020617';
 
   const calculateHeight = () => {
     const navEl = navRef.current;

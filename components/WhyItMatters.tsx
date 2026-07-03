@@ -90,7 +90,7 @@ export const WhyItMatters: React.FC = () => {
             <span>Empowering Your Journey</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-serif font-bold text-white mb-6 tracking-tight">
-            Why the Academic Review Index Matters
+            Why Rate My Professor Matters
           </h2>
           <p className="text-slate-400 text-base md:text-lg leading-relaxed">
             Selecting a course is more than checking off a graduation requirement. It's about matching with the right pedagogy, balancing your mental workload, and taking control of your learning.
@@ -414,7 +414,7 @@ export const WhyItMatters: React.FC = () => {
                   <ThumbsUp className="w-3.5 h-3.5 text-blue-500" />
                   <span>siswa account guaranteed for review integrity</span>
                 </div>
-                <span>UKM Academic Review Index</span>
+                <span>UKM Rate My Professor</span>
               </div>
 
             </div>

@@ -20,6 +20,7 @@
   position: relative;
   overflow: hidden;
   will-change: height;
+  transition: background-color 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.5s ease;
 }
 
 .card-nav-top {

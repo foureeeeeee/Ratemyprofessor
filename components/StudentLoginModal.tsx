@@ -105,36 +105,99 @@ export const StudentLoginModal: React.FC<Props> = ({ onClose, onLogin }) => {
         {/* TOS Overlay */}
         {showTOS && (
           <InfoModal title="Terms of Service" icon={FileText} onClose={() => setShowTOS(false)}>
-            <p className="font-medium text-slate-900 mb-4">Effective Date: May 24, 2026</p>
-            <h3>1. Acceptance of Terms</h3>
-            <p>By accessing and using this platform, you agree to be bound by these Terms of Service. If you do not agree, please do not use our services.</p>
-            
-            <h3>2. User Responsibilities & Conduct</h3>
-            <p>Users must submit genuine, constructive, and respectful feedback. Any form of harassment, hate speech, spamming, or sharing of strictly confidential exam materials is prohibited and will result in moderation action.</p>
-            
-            <h3>3. Accuracy of Information</h3>
-            <p>We do not verify the factual accuracy of every user review. Experiences are subjective and represent the opinions of individual students, not the institution.</p>
-
-            <h3>4. Account Suspension</h3>
-            <p>Administrators reserve the right to remove access or censor content that violates these guidelines to maintain a safe community environment.</p>
+            <p className="text-xs text-slate-400 font-medium mb-4">Last updated: July 2026</p>
+            <div className="space-y-6 text-sm">
+              <div>
+                <h4 className="font-bold text-slate-800 text-base mb-1.5 flex items-center gap-2">
+                  <span className="w-1.5 h-6 bg-amber-600 rounded-full inline-block"></span>
+                  1. Acceptable Usage Guidelines
+                </h4>
+                <p className="pl-3.5 leading-relaxed text-slate-600">
+                  The UKM Rate My Professor is a peer platform designed for constructive educational evaluations. Users are required to submit reviews that are factual, respectful, and educational. Vulgarity, personal abuse, or targeted harassment of any member of the university community is strictly prohibited.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-bold text-slate-800 text-base mb-1.5 flex items-center gap-2">
+                  <span className="w-1.5 h-6 bg-amber-600 rounded-full inline-block"></span>
+                  2. Review Moderation & Deletions
+                </h4>
+                <p className="pl-3.5 leading-relaxed text-slate-600">
+                  To maintain high-quality academic data, our student moderators and administrators reserve the right to review, edit, or delete any content that contains false claims, hate speech, or violates Universiti Kebangsaan Malaysia student code of ethics.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-bold text-slate-800 text-base mb-1.5 flex items-center gap-2">
+                  <span className="w-1.5 h-6 bg-amber-600 rounded-full inline-block"></span>
+                  3. Honest Rating Limitation
+                </h4>
+                <p className="pl-3.5 leading-relaxed text-slate-600">
+                  You may only review courses you have personally attended or instructors who have taught you. Artificially manipulating rankings using multi-account automation or malicious spamming is a direct breach of these terms.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-bold text-slate-800 text-base mb-1.5 flex items-center gap-2">
+                  <span className="w-1.5 h-6 bg-amber-600 rounded-full inline-block"></span>
+                  4. Academic Disclaimer
+                </h4>
+                <p className="pl-3.5 leading-relaxed text-slate-600">
+                  Ratings, feedback paragraphs, and department recommendations represent the subjective, compiled opinions of UKM students and do not represent official statements or policies of the Universiti Kebangsaan Malaysia administration.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-bold text-slate-800 text-base mb-1.5 flex items-center gap-2">
+                  <span className="w-1.5 h-6 bg-amber-600 rounded-full inline-block"></span>
+                  5. Simulated Data & Research Analytics
+                </h4>
+                <p className="pl-3.5 leading-relaxed text-slate-600">
+                  The statistical data and analytics presented within the &quot;Why Rate My Professor Matters&quot; interactive visualizations are simulated based on interviews, questionnaires, and online research conducted to showcase general educational trends and platform impact.
+                </p>
+              </div>
+            </div>
           </InfoModal>
         )}
 
         {/* Privacy Policy Overlay */}
         {showPrivacy && (
           <InfoModal title="Privacy Policy" icon={Lock} onClose={() => setShowPrivacy(false)}>
-            <p className="font-medium text-slate-900 mb-4">Your Privacy Matters to Us</p>
-            <h3>1. Data Collection</h3>
-            <p>We collect your Siswa email strictly for verification purposes to ensure reviews are from legitimate students. We do not track your browsing history or collect unnecessary metadata.</p>
-            
-            <h3>2. Anonymity & Display Name</h3>
-            <p>Once verified, your email address is fully anonymized. Reviews are tied to pseudonymous usernames to encourage honest feedback without fear of academic retaliation.</p>
-            
-            <h3>3. Data Protection</h3>
-            <p>Your authentication tokens and email records are secured via Supabase using industry-standard encryption. We do not sell your data to third parties.</p>
-
-            <h3>4. Your Rights</h3>
-            <p>You have the right to request the deletion of your account and associated reviews at any time by contacting the administration.</p>
+            <p className="text-xs text-slate-400 font-medium mb-4">Last updated: July 2026</p>
+            <div className="space-y-6 text-sm">
+              <div>
+                <h4 className="font-bold text-slate-800 text-base mb-1.5 flex items-center gap-2">
+                  <span className="w-1.5 h-6 bg-blue-600 rounded-full inline-block"></span>
+                  1. verified Siswa identity protection
+                </h4>
+                <p className="pl-3.5 leading-relaxed text-slate-600">
+                  Our system strictly uses <strong>siswa.ukm.edu.my</strong> account verification to authenticate active students. We do not store your name or ID alongside your published reviews. We believe in providing an honest space where constructive comments are fully anonymous to preserve academic review integrity.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-bold text-slate-800 text-base mb-1.5 flex items-center gap-2">
+                  <span className="w-1.5 h-6 bg-blue-600 rounded-full inline-block"></span>
+                  2. Data Security & Storage
+                </h4>
+                <p className="pl-3.5 leading-relaxed text-slate-600">
+                  Your student email is encrypted and securely stored on our server database only for verification constraints. Reviews, courses, and department metrics are kept up to date using secure Cloud SQL infrastructures. We will never sell, lease, or distribute student telemetry data to external third parties.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-bold text-slate-800 text-base mb-1.5 flex items-center gap-2">
+                  <span className="w-1.5 h-6 bg-blue-600 rounded-full inline-block"></span>
+                  3. Telemetry and Cookies
+                </h4>
+                <p className="pl-3.5 leading-relaxed text-slate-600">
+                  We use local session tokens to persist your verified student session so you do not need to sign in every time. We do not use persistent tracking cookies, ad networks, or external analytics integrations.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-bold text-slate-800 text-base mb-1.5 flex items-center gap-2">
+                  <span className="w-1.5 h-6 bg-blue-600 rounded-full inline-block"></span>
+                  4. Your Rights
+                </h4>
+                <p className="pl-3.5 leading-relaxed text-slate-600">
+                  You have full control over the reviews you post. At any time, you can edit, update, or remove your academic reviews from your personal 'My Learning' dashboard.
+                </p>
+              </div>
+            </div>
           </InfoModal>
         )}
 
