@@ -34,8 +34,8 @@ export const ProfessorCard: React.FC<Props> = ({ professor }) => {
                    className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-500"
                  />
               </div>
-              <div className="flex items-center gap-1 bg-amber-50 text-amber-700 px-2.5 py-1 rounded-full text-sm font-medium">
-                 <Star className="w-4 h-4 fill-current" />
+              <div className="flex items-center gap-1 bg-amber-50 text-amber-700 px-2.5 py-1 rounded-full text-sm font-medium transition-colors group-hover:bg-amber-100">
+                 <Star className="w-4 h-4 fill-current group-hover:animate-pulse" />
                  {professor.averageRating.toFixed(1)}
               </div>
             </div>

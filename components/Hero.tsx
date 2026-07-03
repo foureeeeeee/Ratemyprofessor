@@ -67,9 +67,9 @@ export const Hero: React.FC<Props> = ({ professors = [], courses = [] }) => {
         delay={0.2}
         className="relative z-10 max-w-4xl mx-auto px-6 text-center mt-[-4rem]"
       >
-        <div className="inline-flex items-center justify-center mb-8">
-          <div className="p-4 bg-white shadow-md border border-slate-200 rounded-full mx-auto align-middle">
-             <BookOpen className="w-8 h-8 text-slate-800" />
+        <div className="inline-flex items-center justify-center mb-8 group">
+          <div className="p-4 bg-white shadow-md border border-slate-200 rounded-full mx-auto align-middle group-hover:shadow-lg transition-shadow">
+             <BookOpen className="w-8 h-8 text-slate-800 group-hover:animate-bounce" />
           </div>
         </div>
         
@@ -83,10 +83,10 @@ export const Hero: React.FC<Props> = ({ professors = [], courses = [] }) => {
         </p>
         
         {/* Search Box */}
-        <div className="max-w-3xl mx-auto bg-white/95 backdrop-blur-md p-2 rounded-2xl shadow-2xl shadow-slate-200/50 border border-slate-300 focus-within:ring-4 focus-within:ring-slate-900/5 focus-within:border-slate-400 transition-all duration-300">
+        <div className="max-w-3xl mx-auto bg-white/95 backdrop-blur-md p-2 rounded-2xl shadow-2xl shadow-slate-200/50 border border-slate-300 focus-within:ring-4 focus-within:ring-slate-900/5 focus-within:border-slate-400 transition-all duration-300 group">
           <form onSubmit={handleSearch} className="relative flex items-center">
             <div className="pl-6 pr-4 text-slate-400">
-              <Search className="w-6 h-6" strokeWidth={2} />
+              <Search className="w-6 h-6 group-focus-within:animate-pulse group-focus-within:text-slate-900 transition-colors" strokeWidth={2} />
             </div>
             <input 
               type="text" 
@@ -97,9 +97,9 @@ export const Hero: React.FC<Props> = ({ professors = [], courses = [] }) => {
             />
             <button 
               type="submit"
-              className="h-14 px-8 bg-slate-900 text-white rounded-xl font-bold text-lg hover:bg-slate-800 focus:ring-4 focus:ring-slate-900/20 transition-all shadow-md flex items-center gap-2 pr-8 ml-2 whitespace-nowrap"
+              className="h-14 px-8 bg-slate-900 text-white rounded-xl font-bold text-lg hover:bg-slate-800 focus:ring-4 focus:ring-slate-900/20 transition-all shadow-md flex items-center gap-2 pr-8 ml-2 whitespace-nowrap group/btn"
             >
-              Search <ArrowRight className="w-5 h-5" strokeWidth={2.5} />
+              Search <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" strokeWidth={2.5} />
             </button>
           </form>
         </div>

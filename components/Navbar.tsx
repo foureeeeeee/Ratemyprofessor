@@ -29,7 +29,7 @@ export const Navbar: React.FC<Props> = ({ currentUser, onTriggerLogin, onLogout 
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center gap-3 group" onClick={closeMobileMenu}>
               <div className="p-2 bg-white/50 backdrop-blur-sm rounded-lg group-hover:bg-blue-50/80 transition-colors border border-white/50 shadow-sm">
-                <BookOpen className="h-6 w-6 text-ukm-blue" />
+                <BookOpen className="h-6 w-6 text-ukm-blue group-hover:animate-bounce" />
               </div>
               <span className="font-serif font-bold text-xl md:text-2xl tracking-tight text-slate-900 group-hover:text-ukm-blue transition-colors">
                 UKM Academic
@@ -52,7 +52,7 @@ export const Navbar: React.FC<Props> = ({ currentUser, onTriggerLogin, onLogout 
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/50 backdrop-blur-sm border border-white/60 text-sm font-medium text-slate-700 shadow-sm">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
                   <span>{currentUser.name}</span>
-                  {currentUser.isVerified && <Shield className="w-3.5 h-3.5 text-blue-600" />}
+                  {currentUser.isVerified && <Shield className="w-3.5 h-3.5 text-blue-600 animate-pulse" />}
                 </div>
                 <button 
                   onClick={onLogout}

@@ -41,7 +41,7 @@ export const CourseCard: React.FC<Props> = ({ course, professors, reviews }) => 
           <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
             <span className="font-bold text-ukm-blue border border-blue-200 bg-blue-50 px-2.5 py-1 rounded text-sm tracking-wide">{course.code}</span>
             <div className="flex items-center gap-1 text-sm font-medium text-slate-600">
-               <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+               <Star className="w-4 h-4 text-amber-500 fill-amber-500 group-hover:animate-pulse" />
                {averageRating > 0 ? averageRating.toFixed(1) : '—'}
             </div>
           </div>

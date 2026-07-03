@@ -392,9 +392,9 @@ export const AdminDashboard: React.FC<Props> = ({
       {/* Top Navigation Bar */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-600 rounded-lg">
-              <LayoutDashboard className="w-5 h-5 text-white" />
+          <div className="flex items-center gap-3 group cursor-default">
+            <div className="p-2 bg-blue-600 rounded-lg group-hover:bg-blue-700 transition-colors">
+              <LayoutDashboard className="w-5 h-5 text-white group-hover:animate-bounce" />
             </div>
             <div>
               <h1 className="text-lg font-bold text-slate-900">System Administration</h1>
@@ -405,9 +405,9 @@ export const AdminDashboard: React.FC<Props> = ({
             <span className="text-sm font-medium text-slate-600">Admin: A199710</span>
             <button 
               onClick={onLogout}
-              className="flex items-center gap-2 text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg transition-colors text-sm font-medium"
+              className="flex items-center gap-2 text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg transition-colors text-sm font-medium group"
             >
-              <LogOut className="w-4 h-4" /> Logout
+              <LogOut className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Logout
             </button>
           </div>
         </div>
@@ -508,7 +508,7 @@ export const AdminDashboard: React.FC<Props> = ({
             {!analyticsData ? (
               <div className="bg-white rounded-2xl p-16 text-center border border-slate-200">
                 <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <BarChart3 className="w-8 h-8 text-slate-400" />
+                  <BarChart3 className="w-8 h-8 text-slate-400 animate-pulse" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900">Insufficient Data</h3>
                 <p className="text-slate-500 mt-2">Not enough reviews found for the selected time range to generate trends.</p>
@@ -920,7 +920,7 @@ export const AdminDashboard: React.FC<Props> = ({
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden p-6 text-center">
             <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <AlertCircle className="w-6 h-6 text-red-600" />
+                <AlertCircle className="w-6 h-6 text-red-600 animate-pulse" />
             </div>
             <h3 className="text-lg font-bold text-slate-900 mb-2">Are you sure?</h3>
             <p className="text-slate-500 text-sm mb-6">

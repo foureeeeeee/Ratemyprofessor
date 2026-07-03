@@ -135,8 +135,8 @@ export const CourseDetails: React.FC<Props> = ({ courses, professors, reviews, o
   return (
     <div className="bg-slate-50 min-h-screen py-8 font-sans">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Link to="/courses" className="inline-flex items-center text-sm text-slate-500 hover:text-slate-800 mb-6 transition-colors">
-          <ArrowLeft className="w-4 h-4 mr-1" /> Back to Course List
+        <Link to="/courses" className="inline-flex items-center text-sm text-slate-500 hover:text-slate-800 mb-6 transition-colors group">
+          <ArrowLeft className="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" /> Back to Course List
         </Link>
 
         {/* Header Card */}
@@ -145,10 +145,10 @@ export const CourseDetails: React.FC<Props> = ({ courses, professors, reviews, o
            {/* Report Button for Course Info */}
            <button 
             onClick={() => openReportModal(course.id, 'course', course.name)}
-            className="absolute top-4 right-4 flex items-center gap-2 px-3 py-2 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+            className="absolute top-4 right-4 flex items-center gap-2 px-3 py-2 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all group/report"
             title="Report Inaccurate Information"
           >
-            <Flag className="w-4 h-4" />
+            <Flag className="w-4 h-4 group-hover/report:animate-pulse" />
             <span className="hidden sm:inline">Report Issue</span>
           </button>
 
