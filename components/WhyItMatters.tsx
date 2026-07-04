@@ -200,26 +200,26 @@ export const WhyItMatters: React.FC = () => {
 
             {/* Right Simulator Card Column */}
             <div className="w-full lg:w-1/2">
-              <div className="bg-slate-950 rounded-2xl p-6 md:p-8 border border-slate-800 relative overflow-hidden shadow-2xl h-[360px] flex flex-col justify-between">
+              <div className="bg-gradient-to-b from-slate-900 to-slate-950 rounded-3xl p-6 md:p-8 border border-slate-800/60 relative overflow-hidden shadow-2xl h-[380px] flex flex-col justify-between">
                 
-                {/* Background grid design */}
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:24px_24px] opacity-30" />
+                {/* Clean soft ambient glow instead of hard cyber grids */}
+                <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
 
                 <AnimatePresence mode="wait">
                   {activeTab === 'blind' ? (
                     <motion.div
                       key="blind-sim"
-                      initial={{ opacity: 0, scale: 0.95 }}
+                      initial={{ opacity: 0, scale: 0.97 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
+                      exit={{ opacity: 0, scale: 0.97 }}
                       transition={{ duration: 0.3 }}
-                      className="space-y-6 relative z-10 h-full flex flex-col justify-between"
+                      className="space-y-5 relative z-10 h-full flex flex-col justify-between"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="px-3 py-1 rounded-full bg-red-950 border border-red-900/50 text-[10px] uppercase font-bold text-red-400 tracking-wider">
+                        <span className="px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-[10px] uppercase font-bold text-red-400 tracking-wider">
                           Scenario A: Pure Chance
                         </span>
-                        <span className="text-xs text-slate-500 font-mono">ID: 404_BLIND</span>
                       </div>
 
                       {/* Simulator Body */}
@@ -229,7 +229,7 @@ export const WhyItMatters: React.FC = () => {
                           <span className="text-xl font-bold text-red-400 font-mono">2.82 / 4.00</span>
                         </div>
                         {/* Interactive gauge */}
-                        <div className="h-3 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                        <div className="h-2.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800/80">
                           <motion.div 
                             initial={{ width: 0 }}
                             animate={{ width: "65%" }}
@@ -237,39 +237,39 @@ export const WhyItMatters: React.FC = () => {
                           />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3 pt-2">
-                          <div className="p-3 bg-slate-900/80 border border-slate-800/80 rounded-xl">
-                            <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-wider">Anxiety Level</span>
-                            <span className="text-base font-bold text-red-300">Extreme (89%)</span>
+                        <div className="grid grid-cols-2 gap-4 pt-1">
+                          <div className="p-3.5 bg-slate-950/55 border border-slate-800/60 rounded-2xl hover:border-slate-800 transition-colors">
+                            <span className="block text-[11px] text-slate-500 font-semibold uppercase tracking-wider mb-0.5">Anxiety Level</span>
+                            <span className="text-sm md:text-base font-bold text-red-300">Extreme (89%)</span>
                           </div>
-                          <div className="p-3 bg-slate-900/80 border border-slate-800/80 rounded-xl">
-                            <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-wider">Course Alignment</span>
-                            <span className="text-base font-bold text-amber-300">Poor Match</span>
+                          <div className="p-3.5 bg-slate-950/55 border border-slate-800/60 rounded-2xl hover:border-slate-800 transition-colors">
+                            <span className="block text-[11px] text-slate-500 font-semibold uppercase tracking-wider mb-0.5">Course Match</span>
+                            <span className="text-sm md:text-base font-bold text-amber-300">Poor Match</span>
                           </div>
                         </div>
                       </div>
 
-                      <div className="bg-red-950/20 border border-red-900/40 p-3.5 rounded-xl flex gap-3 items-center">
-                        <div className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-                        <span className="text-xs text-red-300 font-medium leading-normal">
-                          Student feedback: "Syllabus was completely different from what I expected. Exams were extremely heavy on memorization."
-                        </span>
+                      {/* Softer student quote box */}
+                      <div className="bg-slate-950/45 border border-slate-850 p-4 rounded-2xl flex gap-3 items-start shadow-inner">
+                        <span className="text-2xl text-red-400/80 font-serif leading-none mt-0.5 select-none">&ldquo;</span>
+                        <p className="text-xs text-slate-300 leading-relaxed italic">
+                          Syllabus was completely different from what I expected. Exams were extremely heavy on memorization.
+                        </p>
                       </div>
                     </motion.div>
                   ) : (
                     <motion.div
                       key="informed-sim"
-                      initial={{ opacity: 0, scale: 0.95 }}
+                      initial={{ opacity: 0, scale: 0.97 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
+                      exit={{ opacity: 0, scale: 0.97 }}
                       transition={{ duration: 0.3 }}
-                      className="space-y-6 relative z-10 h-full flex flex-col justify-between"
+                      className="space-y-5 relative z-10 h-full flex flex-col justify-between"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="px-3 py-1 rounded-full bg-emerald-950 border border-emerald-900/50 text-[10px] uppercase font-bold text-emerald-400 tracking-wider">
+                        <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] uppercase font-bold text-emerald-400 tracking-wider">
                           Scenario B: Academic Index Active
                         </span>
-                        <span className="text-xs text-slate-500 font-mono">ID: 200_INFORMED</span>
                       </div>
 
                       {/* Simulator Body */}
@@ -279,7 +279,7 @@ export const WhyItMatters: React.FC = () => {
                           <span className="text-xl font-bold text-emerald-400 font-mono">3.74 / 4.00</span>
                         </div>
                         {/* Interactive gauge */}
-                        <div className="h-3 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                        <div className="h-2.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800/80">
                           <motion.div 
                             initial={{ width: 0 }}
                             animate={{ width: "93%" }}
@@ -287,23 +287,24 @@ export const WhyItMatters: React.FC = () => {
                           />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3 pt-2">
-                          <div className="p-3 bg-slate-900/80 border border-slate-800/80 rounded-xl">
-                            <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-wider">Anxiety Level</span>
-                            <span className="text-base font-bold text-emerald-300">Very Low (15%)</span>
+                        <div className="grid grid-cols-2 gap-4 pt-1">
+                          <div className="p-3.5 bg-slate-950/55 border border-slate-800/60 rounded-2xl hover:border-slate-800 transition-colors">
+                            <span className="block text-[11px] text-slate-500 font-semibold uppercase tracking-wider mb-0.5">Anxiety Level</span>
+                            <span className="text-sm md:text-base font-bold text-emerald-300">Very Low (15%)</span>
                           </div>
-                          <div className="p-3 bg-slate-900/80 border border-slate-800/80 rounded-xl">
-                            <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-wider">Course Alignment</span>
-                            <span className="text-base font-bold text-emerald-300">Perfect Fit</span>
+                          <div className="p-3.5 bg-slate-950/55 border border-slate-800/60 rounded-2xl hover:border-slate-800 transition-colors">
+                            <span className="block text-[11px] text-slate-500 font-semibold uppercase tracking-wider mb-0.5">Course Match</span>
+                            <span className="text-sm md:text-base font-bold text-emerald-300">Perfect Fit</span>
                           </div>
                         </div>
                       </div>
 
-                      <div className="bg-emerald-950/20 border border-emerald-900/40 p-3.5 rounded-xl flex gap-3 items-center">
-                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-xs text-emerald-300 font-medium leading-normal">
-                          Student feedback: "Exams exactly mirrored the reviews. Understood the project weights early and managed my team perfectly."
-                        </span>
+                      {/* Softer student quote box */}
+                      <div className="bg-slate-950/45 border border-slate-850 p-4 rounded-2xl flex gap-3 items-start shadow-inner">
+                        <span className="text-2xl text-emerald-400/80 font-serif leading-none mt-0.5 select-none">&ldquo;</span>
+                        <p className="text-xs text-slate-300 leading-relaxed italic">
+                          Exams exactly mirrored the reviews. Understood the project weights early and managed my team perfectly.
+                        </p>
                       </div>
                     </motion.div>
                   )}
@@ -338,14 +339,14 @@ export const WhyItMatters: React.FC = () => {
                     onClick={() => setSelectedBenefit(idx)}
                     className={`w-full text-left p-4 rounded-2xl border transition-all duration-300 flex items-center gap-4 ${
                       selectedBenefit === idx 
-                        ? 'bg-slate-900 border-blue-500/40 shadow-lg shadow-blue-500/5' 
-                        : 'bg-slate-950/40 border-slate-900 hover:bg-slate-900/30 text-slate-400 hover:text-slate-200'
+                        ? 'bg-slate-900 border-slate-700/80 shadow-xl shadow-slate-950/40' 
+                        : 'bg-slate-950/30 border-slate-900/60 hover:bg-slate-900/25 text-slate-400 hover:text-slate-200'
                     }`}
                   >
-                    <div className={`p-2.5 rounded-xl ${
-                      selectedBenefit === idx ? 'bg-blue-500/10 text-blue-400' : 'bg-slate-900 text-slate-500'
+                    <div className={`p-2.5 rounded-full transition-colors duration-300 ${
+                      selectedBenefit === idx ? 'bg-slate-800 text-amber-400' : 'bg-slate-950 text-slate-500'
                     }`}>
-                      <IconComp size={22} />
+                      <IconComp size={20} />
                     </div>
                     <div>
                       <h4 className={`text-sm font-bold ${selectedBenefit === idx ? 'text-white' : 'text-slate-300'}`}>
@@ -356,7 +357,7 @@ export const WhyItMatters: React.FC = () => {
                       </p>
                     </div>
                     <ArrowUpRight className={`w-4 h-4 ml-auto transition-transform ${
-                      selectedBenefit === idx ? 'text-blue-400 translate-x-0.5 -translate-y-0.5' : 'text-slate-600'
+                      selectedBenefit === idx ? 'text-amber-400 translate-x-0.5 -translate-y-0.5' : 'text-slate-600'
                     }`} />
                   </button>
                 );
@@ -366,25 +367,24 @@ export const WhyItMatters: React.FC = () => {
 
           {/* Interactive display details */}
           <div className="lg:col-span-2">
-            <div className="bg-slate-900/40 backdrop-blur-md border border-slate-800 rounded-3xl p-8 h-full flex flex-col justify-between">
+            <div className="bg-gradient-to-br from-slate-900/70 to-slate-950/50 backdrop-blur-md border border-slate-800/60 rounded-3xl p-8 h-full flex flex-col justify-between shadow-xl">
               
               <AnimatePresence mode="wait">
                 <motion.div
                   key={selectedBenefit}
-                  initial={{ opacity: 0, x: 20 }}
+                  initial={{ opacity: 0, x: 15 }}
                   animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
+                  exit={{ opacity: 0, x: -15 }}
+                  transition={{ duration: 0.25 }}
                   className="space-y-6"
                 >
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                      <span className="text-xs font-bold uppercase tracking-widest text-slate-500">Pillar 0{selectedBenefit + 1}</span>
                       <h4 className="text-2xl md:text-3xl font-serif font-bold text-white mt-1">
                         {benefits[selectedBenefit].title}
                       </h4>
                     </div>
-                    <div className="px-4 py-2 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-slate-300 font-bold flex items-center gap-2 self-start md:self-auto">
+                    <div className="px-4 py-2 rounded-2xl bg-slate-950/70 border border-slate-850 text-xs text-slate-300 font-bold flex items-center gap-2 self-start md:self-auto">
                       <TrendingUp className="w-4 h-4 text-emerald-400" />
                       <span>{benefits[selectedBenefit].metric}</span>
                     </div>
@@ -394,12 +394,12 @@ export const WhyItMatters: React.FC = () => {
                     {benefits[selectedBenefit].description}
                   </p>
 
-                  <div className="border-t border-slate-800/80 pt-6 space-y-4">
+                  <div className="border-t border-slate-800/60 pt-6 space-y-4">
                     <h5 className="text-xs font-bold uppercase text-slate-500 tracking-wider">Key Details Included:</h5>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {benefits[selectedBenefit].points.map((pt, pIdx) => (
                         <div key={pIdx} className="flex items-center gap-2.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                           <span className="text-sm text-slate-300">{pt}</span>
                         </div>
                       ))}
@@ -409,7 +409,7 @@ export const WhyItMatters: React.FC = () => {
               </AnimatePresence>
 
               {/* Aesthetic footer */}
-              <div className="mt-8 pt-6 border-t border-slate-800/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-xs text-slate-500">
+              <div className="mt-8 pt-6 border-t border-slate-800/40 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-xs text-slate-500">
                 <div className="flex items-center gap-1.5">
                   <ThumbsUp className="w-3.5 h-3.5 text-blue-500" />
                   <span>siswa account guaranteed for review integrity</span>
