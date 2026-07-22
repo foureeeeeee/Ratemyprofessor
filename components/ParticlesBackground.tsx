@@ -190,7 +190,7 @@ export const ParticlesBackground: React.FC<Props> = ({
       window.removeEventListener('mousemove', handleMouseMove);
       cancelAnimationFrame(animationFrameId);
     };
-  }, [particleColor, particleCountFactor, interactionDistance, baseSpeed, mouseForce]);
+  }, [particleColor, lineColor, particleCountFactor, interactionDistance, connectDistance, baseSpeed, mouseForce]);
 
   return (
     <canvas 

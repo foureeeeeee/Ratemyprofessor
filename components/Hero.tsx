@@ -6,6 +6,9 @@ import { Professor, Course } from '../types';
 import AnimatedContent from './AnimatedContent';
 import { WhyItMatters } from './WhyItMatters';
 
+// @ts-ignore
+import libraryBg from '../src/assets/images/university_library_bg_1784716518650.jpg';
+
 interface Props {
   professors?: Professor[];
   courses?: Course[];
@@ -22,31 +25,25 @@ export const Hero: React.FC<Props> = ({
   onOpenTerms
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [isBgLoaded, setIsBgLoaded] = useState(false);
   const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const target = containerRef.current;
-      if (target) {
-        // If scrolled down past 40% of the first section, change theme to dark
-        const threshold = target.clientHeight * 0.4;
-        if (target.scrollTop > threshold) {
-          onNavbarThemeChange?.('dark');
-        } else {
-          onNavbarThemeChange?.('light');
-        }
-      }
-    };
-
-    const container = containerRef.current;
-    if (container) {
-      container.addEventListener('scroll', handleScroll);
+    // Preload image for a perfect fade-in animation once fully loaded
+    const img = new Image();
+    img.src = libraryBg;
+    if (img.complete) {
+      setIsBgLoaded(true);
+    } else {
+      img.onload = () => {
+        setIsBgLoaded(true);
+      };
     }
+
+    // Keep the navbar theme dark for the entire premium dark homepage
+    onNavbarThemeChange?.('dark');
     return () => {
-      if (container) {
-        container.removeEventListener('scroll', handleScroll);
-      }
       onNavbarThemeChange?.('light');
     };
   }, [onNavbarThemeChange]);
@@ -80,22 +77,49 @@ export const Hero: React.FC<Props> = ({
   };
 
   return (
-    <div ref={containerRef} className="h-[calc(100vh-7rem)] overflow-y-auto snap-y snap-mandatory scroll-smooth relative bg-slate-50">
+    <div ref={containerRef} className="h-[calc(100vh-7rem)] overflow-y-auto snap-y snap-mandatory scroll-smooth relative bg-slate-950">
       {/* Search & Hero Screen */}
       <div className="relative overflow-hidden h-full min-h-[550px] flex items-center justify-center pb-12 snap-start shrink-0">
-        <div className="absolute inset-0 z-0 opacity-100 mix-blend-multiply">
+        
+        {/* Layer 1: Base Library Image with Soft Blur */}
+        <div 
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{
+            backgroundImage: `url(${libraryBg})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            filter: 'blur(5px)',
+            opacity: isBgLoaded ? 1 : 0,
+            transform: isBgLoaded ? 'scale(1)' : 'scale(1.04)',
+            transition: 'opacity 1000ms cubic-bezier(0.16, 1, 0.3, 1), transform 1200ms cubic-bezier(0.16, 1, 0.3, 1)',
+          }}
+        />
+
+        {/* Layer 2: Premium Dark Navy Gradient Overlay */}
+        <div 
+          className="absolute inset-0 z-[1] pointer-events-none"
+          style={{
+            background: 'linear-gradient(180deg, rgba(8, 15, 35, 0.55) 0%, rgba(12, 24, 52, 0.65) 45%, rgba(10, 18, 40, 0.72) 100%)',
+          }}
+        />
+        
+        {/* Layer 3: Particle Animation (~70% reduced density, slowed speed, clear subtle visibility) */}
+        <div 
+          className="absolute inset-0 z-[2] pointer-events-none transition-opacity duration-1000 ease-out"
+          style={{
+            opacity: isBgLoaded ? 1 : 0,
+          }}
+        >
           <ParticlesBackground 
-            particleCountFactor={2000}
-            baseSpeed={0.3}
-            particleColor="#64748b"
-            lineColor="rgba(100, 116, 139, 0.3)"
-            mouseForce={-0.8}
-            connectDistance={180}
+            particleCountFactor={6500}                  // 70% reduction in density relative to original 2000
+            baseSpeed={0.12}                             // Calm, slow ambient AI movement
+            particleColor="rgba(255, 255, 255, 0.55)"   // Crisp visible nodes
+            lineColor="rgba(255, 255, 255, 0.15)"       // Clearly visible subtle constellation lines
+            mouseForce={-0.4}                            // Subtle interactive reaction to cursor
+            connectDistance={150}                        // Balanced line connections
           />
         </div>
-        
-        {/* Subtle radial gradient to center content visually */}
-        <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,transparent_0%,#f8fafc_90%)] pointer-events-none"></div>
         
         <AnimatedContent
           distance={150}
@@ -111,24 +135,24 @@ export const Hero: React.FC<Props> = ({
           className="relative z-10 max-w-4xl mx-auto px-6 text-center mt-[-2rem]"
         >
           <div className="inline-flex items-center justify-center mb-8 group">
-            <div className="p-4 bg-white shadow-md border border-slate-200 rounded-full mx-auto align-middle group-hover:shadow-lg transition-shadow">
-               <BookOpen className="w-8 h-8 text-slate-800 group-hover:animate-bounce" />
+            <div className="p-4 bg-white/5 backdrop-blur-md shadow-xl border border-white/10 rounded-full mx-auto align-middle hover:bg-white/10 transition-all duration-300">
+               <BookOpen className="w-8 h-8 text-slate-200 group-hover:animate-bounce" strokeWidth={1.5} />
             </div>
           </div>
           
-          <p className="text-sm md:text-base uppercase tracking-[0.2em] font-bold text-slate-500 mb-3">
+          <p className="text-sm md:text-base uppercase tracking-[0.25em] font-bold text-slate-400 mb-3">
             Universiti Kebangsaan Malaysia
           </p>
-          <h1 className="text-5xl md:text-7xl font-serif text-slate-900 mb-6 tracking-tight leading-tight">
+          <h1 className="text-5xl md:text-7xl font-serif text-white mb-6 tracking-tight leading-tight">
             <span className="italic font-medium">Rate My Professor</span>
           </h1>
 
-          <p className="text-slate-600 text-sm md:text-base max-w-xl mx-auto mb-10 font-normal leading-relaxed">
+          <p className="text-slate-300 text-sm md:text-base max-w-xl mx-auto mb-10 font-normal leading-relaxed">
             Verified course and instructor evaluations from real UKM students.
           </p>
           
           {/* Search Box */}
-          <div className="max-w-2xl mx-auto bg-white/95 backdrop-blur-md p-1.5 rounded-xl shadow-xl shadow-slate-200/40 border border-slate-200 focus-within:ring-4 focus-within:ring-slate-900/5 focus-within:border-slate-400 transition-all duration-300 group">
+          <div className="max-w-2xl mx-auto bg-white/95 backdrop-blur-md p-1.5 rounded-xl shadow-2xl shadow-slate-950/40 border border-slate-200 focus-within:ring-4 focus-within:ring-white/10 focus-within:border-slate-300 transition-all duration-300 group">
             <form onSubmit={handleSearch} className="relative flex items-center">
               <div className="pl-4 pr-2 text-slate-400">
                 <Search className="w-5 h-5 group-focus-within:animate-pulse group-focus-within:text-slate-900 transition-colors" strokeWidth={2} />
@@ -153,20 +177,20 @@ export const Hero: React.FC<Props> = ({
           {/* Lightweight Stats Row */}
           <div className="mt-4 flex justify-center items-center gap-3 text-xs md:text-sm font-medium text-slate-400 select-none">
             <span>49,000+ Students</span>
-            <span className="text-slate-300 font-bold">•</span>
+            <span className="text-slate-600 font-bold">•</span>
             <span>13 Faculties</span>
-            <span className="text-slate-300 font-bold">•</span>
+            <span className="text-slate-600 font-bold">•</span>
             <span>Est. 1970</span>
           </div>
 
-          <div className="mt-16 flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-500">
+          <div className="mt-16 flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-400">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Verified Reviews
             </div>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-amber-500"></span> Authentic Insights
             </div>
-            <Link to="/admin/login" className="flex items-center gap-1 hover:text-ukm-blue transition-colors underline underline-offset-4 decoration-slate-300">
+            <Link to="/admin/login" className="flex items-center gap-1 hover:text-blue-400 transition-colors underline underline-offset-4 decoration-slate-600">
               Administrator Access &rarr;
             </Link>
           </div>
@@ -175,11 +199,11 @@ export const Hero: React.FC<Props> = ({
         {/* Floating Elegant Scroll Indicator */}
         <div 
           onClick={scrollToWhyItMatters}
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-xs font-semibold text-slate-400 select-none cursor-pointer hover:text-slate-600 transition-colors z-20 group"
+          className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-xs font-semibold text-slate-400/80 select-none cursor-pointer hover:text-slate-200 transition-colors z-20 group"
         >
           <span>Scroll to Explore</span>
-          <div className="w-6 h-10 border-2 border-slate-300 rounded-full flex justify-center p-1.5 transition-colors group-hover:border-slate-500">
-            <div className="w-1.5 h-2.5 bg-slate-400 rounded-full animate-bounce group-hover:bg-slate-600" />
+          <div className="w-6 h-10 border-2 border-slate-750 rounded-full flex justify-center p-1.5 transition-colors group-hover:border-slate-500">
+            <div className="w-1.5 h-2.5 bg-slate-500 rounded-full animate-bounce group-hover:bg-slate-300" />
           </div>
         </div>
       </div>
