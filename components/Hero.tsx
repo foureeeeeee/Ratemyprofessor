@@ -7,7 +7,7 @@ import AnimatedContent from './AnimatedContent';
 import { WhyItMatters } from './WhyItMatters';
 
 // @ts-ignore
-import libraryBg from '../src/assets/images/university_library_bg_1784716518650.jpg';
+import libraryBg from '../src/assets/images/d8753ab1ccde7ca176e9dc432e0920eef36de5c20025f67a43e1ff00526c002c.png';
 
 interface Props {
   professors?: Professor[];
@@ -96,30 +96,49 @@ export const Hero: React.FC<Props> = ({
           }}
         />
 
-        {/* Layer 2: Premium Dark Navy Gradient Overlay */}
+        {/* Layer 2: Dark Navy Gradient Overlay with Top Nav Separation */}
         <div 
-          className="absolute inset-0 z-[1] pointer-events-none"
+          className="absolute inset-0 z-[1] pointer-events-none border-t border-white/10"
           style={{
-            background: 'linear-gradient(180deg, rgba(8, 15, 35, 0.55) 0%, rgba(12, 24, 52, 0.65) 45%, rgba(10, 18, 40, 0.72) 100%)',
+            background: 'linear-gradient(180deg, rgba(5, 11, 26, 0.82) 0%, rgba(10, 20, 44, 0.65) 45%, rgba(8, 15, 35, 0.76) 100%)',
+          }}
+        />
+
+        {/* Layer 2.5: Outer Edge Vignette */}
+        <div 
+          className="absolute inset-0 z-[2] pointer-events-none"
+          style={{
+            background: 'radial-gradient(ellipse at center, transparent 30%, rgba(2, 6, 18, 0.7) 100%)',
           }}
         />
         
-        {/* Layer 3: Particle Animation (~70% reduced density, slowed speed, clear subtle visibility) */}
+        {/* Layer 3: Particle Animation (~70% reduced density, slowed speed, center fade, 20-30% lower opacity) */}
         <div 
-          className="absolute inset-0 z-[2] pointer-events-none transition-opacity duration-1000 ease-out"
+          className="absolute inset-0 z-[3] pointer-events-none transition-opacity duration-1000 ease-out"
           style={{
             opacity: isBgLoaded ? 1 : 0,
           }}
         >
           <ParticlesBackground 
-            particleCountFactor={6500}                  // 70% reduction in density relative to original 2000
-            baseSpeed={0.12}                             // Calm, slow ambient AI movement
-            particleColor="rgba(255, 255, 255, 0.55)"   // Crisp visible nodes
-            lineColor="rgba(255, 255, 255, 0.15)"       // Clearly visible subtle constellation lines
-            mouseForce={-0.4}                            // Subtle interactive reaction to cursor
-            connectDistance={150}                        // Balanced line connections
+            particleCountFactor={6500}                  // 70% density reduction
+            baseSpeed={0.11}                             // Calm, slow ambient AI movement
+            particleColor="rgba(255, 255, 255, 0.40)"   // Reduced node opacity (down ~27%)
+            lineColor="rgba(255, 255, 255, 0.10)"       // Reduced line opacity (down ~33%)
+            mouseForce={-0.4}                            // Interactive reaction
+            connectDistance={140}                        // Balanced line connections
           />
         </div>
+
+        {/* Soft radial white glow directly behind hero text */}
+        <div 
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] md:w-[900px] h-[480px] pointer-events-none z-[4]"
+          style={{
+            background: 'radial-gradient(circle, rgba(255, 255, 255, 0.08), transparent 70%)',
+          }}
+        />
+
+        {/* Soft dark vignette behind text for maximum legibility */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] md:w-[800px] h-[400px] bg-slate-950/35 rounded-full blur-3xl pointer-events-none z-[4]" />
         
         <AnimatedContent
           distance={150}
@@ -132,42 +151,42 @@ export const Hero: React.FC<Props> = ({
           scale={0.8}
           threshold={0.1}
           delay={0.2}
-          className="relative z-10 max-w-4xl mx-auto px-6 text-center mt-[-2rem]"
+          className="relative z-10 max-w-5xl mx-auto px-6 text-center mt-[-1.5rem]"
         >
-          <div className="inline-flex items-center justify-center mb-8 group">
+          <div className="inline-flex items-center justify-center mb-7 group">
             <div className="p-4 bg-white/5 backdrop-blur-md shadow-xl border border-white/10 rounded-full mx-auto align-middle hover:bg-white/10 transition-all duration-300">
                <BookOpen className="w-8 h-8 text-slate-200 group-hover:animate-bounce" strokeWidth={1.5} />
             </div>
           </div>
           
-          <p className="text-sm md:text-base uppercase tracking-[0.25em] font-bold text-slate-400 mb-3">
+          <p className="text-sm md:text-base uppercase tracking-[0.25em] font-bold text-slate-300 mb-3 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
             Universiti Kebangsaan Malaysia
           </p>
-          <h1 className="text-5xl md:text-7xl font-serif text-white mb-6 tracking-tight leading-tight">
+          <h1 className="text-5xl md:text-7xl font-serif text-white mb-5 tracking-tight leading-tight drop-shadow-[0_4px_16px_rgba(0,0,0,0.85)]">
             <span className="italic font-medium">Rate My Professor</span>
           </h1>
 
-          <p className="text-slate-300 text-sm md:text-base max-w-xl mx-auto mb-10 font-normal leading-relaxed">
+          <p className="text-slate-200 text-sm md:text-base max-w-xl mx-auto mb-7 font-normal leading-relaxed drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
             Verified course and instructor evaluations from real UKM students.
           </p>
           
-          {/* Search Box */}
-          <div className="max-w-2xl mx-auto bg-white/95 backdrop-blur-md p-1.5 rounded-xl shadow-2xl shadow-slate-950/40 border border-slate-200 focus-within:ring-4 focus-within:ring-white/10 focus-within:border-slate-300 transition-all duration-300 group">
+          {/* Search Box - Focal Brightest Object */}
+          <div className="max-w-3xl mx-auto bg-white p-1.5 rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.7),0_0_28px_rgba(255,255,255,0.25)] border-2 border-white focus-within:ring-4 focus-within:ring-white/30 focus-within:border-slate-100 transition-all duration-300 group">
             <form onSubmit={handleSearch} className="relative flex items-center">
-              <div className="pl-4 pr-2 text-slate-400">
-                <Search className="w-5 h-5 group-focus-within:animate-pulse group-focus-within:text-slate-900 transition-colors" strokeWidth={2} />
+              <div className="pl-4 pr-2 text-slate-500">
+                <Search className="w-5 h-5 group-focus-within:animate-pulse group-focus-within:text-slate-900 transition-colors" strokeWidth={2.2} />
               </div>
               <input 
                 id="hero-search-input"
                 type="text" 
-                className="w-full h-11 bg-transparent text-slate-900 outline-none font-sans text-sm md:text-base placeholder:text-slate-400 font-medium"
+                className="w-full h-11 bg-transparent text-slate-900 outline-none font-sans text-sm md:text-base placeholder:text-slate-400 font-semibold"
                 placeholder="Search faculty, courses, or departments..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
               <button 
                 type="submit"
-                className="h-11 px-5 bg-slate-900 text-white rounded-lg font-bold text-sm md:text-base hover:bg-slate-800 focus:ring-4 focus:ring-slate-900/20 transition-all shadow-md flex items-center gap-1.5 ml-1.5 pr-5 whitespace-nowrap group/btn"
+                className="h-11 px-6 bg-gradient-to-r from-[#0B1736] to-[#12234D] hover:from-[#0E1E47] hover:to-[#172E63] text-white rounded-[14px] font-bold text-sm md:text-base hover:-translate-y-[1px] active:translate-y-0 focus:ring-4 focus:ring-slate-900/20 transition-all shadow-md shadow-slate-950/20 hover:shadow-lg hover:shadow-slate-950/40 flex items-center gap-1.5 ml-1.5 pr-6 whitespace-nowrap group/btn"
               >
                 Search <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" strokeWidth={2.5} />
               </button>

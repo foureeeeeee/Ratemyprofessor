@@ -114,15 +114,26 @@ export const ParticlesBackground: React.FC<Props> = ({
 
       draw() {
         if (!ctx) return;
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const dxCenter = this.x - centerX;
+        const dyCenter = this.y - centerY;
+        const distCenter = Math.sqrt(dxCenter * dxCenter + dyCenter * dyCenter);
+        
+        // Attenuate opacity significantly around the center text area (within ~240px)
+        const centerFactor = Math.min(1, Math.max(0.04, (distCenter - 150) / 200));
+
+        ctx.save();
+        ctx.globalAlpha = centerFactor;
+
         if (this.type === 'dot') {
           ctx.beginPath();
           ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
           ctx.fillStyle = this.color;
           ctx.fill();
         } else {
-          ctx.save();
           ctx.fillStyle = this.color;
-          ctx.globalAlpha = 0.35; // keep it subtle in the background
+          ctx.globalAlpha = 0.3 * centerFactor; // keep it subtle in the background
           if (this.type === 'star') {
             ctx.font = `${this.size}px serif`;
           } else {
@@ -131,8 +142,8 @@ export const ParticlesBackground: React.FC<Props> = ({
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.fillText(this.symbol, this.x, this.y);
-          ctx.restore();
         }
+        ctx.restore();
       }
     }
 
@@ -148,11 +159,22 @@ export const ParticlesBackground: React.FC<Props> = ({
     const animate = () => {
       if (!ctx) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
       
       for (let i = 0; i < particles.length; i++) {
         particles[i].update();
         particles[i].draw();
         
+        // Calculate center factor for particle i
+        const dxi = particles[i].x - centerX;
+        const dyi = particles[i].y - centerY;
+        const disti = Math.sqrt(dxi * dxi + dyi * dyi);
+        const centerFactorI = Math.min(1, Math.max(0.04, (disti - 150) / 200));
+
+        if (centerFactorI < 0.1) continue; // Skip lines near center
+
         // Draw lines
         for (let j = i; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
@@ -160,12 +182,21 @@ export const ParticlesBackground: React.FC<Props> = ({
           const distance = Math.sqrt(dx * dx + dy * dy);
           
           if (distance < connectDistance) {
+            const dxj = particles[j].x - centerX;
+            const dyj = particles[j].y - centerY;
+            const distj = Math.sqrt(dxj * dxj + dyj * dyj);
+            const centerFactorJ = Math.min(1, Math.max(0.04, (distj - 150) / 200));
+            const lineCenterAlpha = Math.min(centerFactorI, centerFactorJ);
+
+            ctx.save();
+            ctx.globalAlpha = lineCenterAlpha;
             ctx.beginPath();
             ctx.strokeStyle = lineColor;
             ctx.lineWidth = 1 - (distance / connectDistance);
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
             ctx.stroke();
+            ctx.restore();
           }
         }
       }
