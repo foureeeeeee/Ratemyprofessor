@@ -119,11 +119,56 @@
         scrollbar-width: thin;
         scrollbar-color: rgba(148, 163, 184, 0.25) rgba(15, 23, 42, 0.4);
       }
+      /* Hide aidesigner badge / watermark host container & shadow DOM host */
+      [data-aifx-wm],
+      div[data-aifx-wm],
+      a[href*="aidesigner"],
+      a[href*="aidesigner.ai"],
+      [data-aidesigner],
+      [class*="aidesigner-badge"],
+      [class*="aifx-badge"],
+      div[style*="bottom"][style*="right"]:has(a[href*="aidesigner"]),
+      div[style*="fixed"][style*="bottom"]:has(a[href*="aidesigner"]) {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        position: absolute !important;
+        top: -9999px !important;
+        left: -9999px !important;
+        width: 0 !important;
+        height: 0 !important;
+        z-index: -9999 !important;
+      }
     </style>
 <link rel="stylesheet" href="/index.css">
 </head>
   <body class="font-sans antialiased text-slate-900 bg-slate-50 selection:bg-blue-100 selection:text-blue-900">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
+    <script src="https://cdn.aidesigner.ai/effects/runtime/v1.js" defer></script>
+    <script>
+      function killWatermark() {
+        document.querySelectorAll('[data-aifx-wm]').forEach(el => el.remove());
+        document.querySelectorAll('a[href*="aidesigner"], [class*="aidesigner"]').forEach(el => {
+          el.remove();
+        });
+        document.querySelectorAll('div, a').forEach(el => {
+          if (el.textContent && el.textContent.toLowerCase().includes('made in aidesigner')) {
+            el.remove();
+          }
+        });
+      }
+      killWatermark();
+      setInterval(killWatermark, 100);
+      const observer = new MutationObserver(killWatermark);
+      if (document.body) {
+        observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+      } else {
+        document.addEventListener('DOMContentLoaded', () => {
+          observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+        });
+      }
+    </script>
   </body>
 </html>

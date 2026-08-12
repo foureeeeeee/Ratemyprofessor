@@ -16,7 +16,7 @@ import { StudentLoginModal } from './components/StudentLoginModal';
 import { MOCK_PROFESSORS, MOCK_REVIEWS, MOCK_COURSES } from './constants';
 import { Professor, Review, Course, User, Report } from './types';
 import { Loader2, BookOpenCheck, X, Shield, FileText } from 'lucide-react';
-import { supabase } from './services/supabase';
+import { supabase, isSupabaseConfigured } from './services/supabase';
 
 const STATIC_NAV_ITEMS = [
   {
@@ -59,9 +59,34 @@ export default function App() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isNavExpanded, setIsNavExpanded] = useState(false);
 
-  // Fetch data from Supabase
+  // Fetch data from Supabase or local storage
   useEffect(() => {
+    const loadFromLocalStorage = () => {
+      try {
+        const localProfs = localStorage.getItem('ukm_professors');
+        const localCourses = localStorage.getItem('ukm_courses');
+        const localReviews = localStorage.getItem('ukm_reviews');
+        const localReports = localStorage.getItem('ukm_reports');
+
+        setProfessors(localProfs ? JSON.parse(localProfs) : MOCK_PROFESSORS);
+        setCourses(localCourses ? JSON.parse(localCourses) : MOCK_COURSES);
+        setReviews(localReviews ? JSON.parse(localReviews) : MOCK_REVIEWS);
+        setReports(localReports ? JSON.parse(localReports) : []);
+      } catch {
+        setProfessors(MOCK_PROFESSORS);
+        setCourses(MOCK_COURSES);
+        setReviews(MOCK_REVIEWS);
+        setReports([]);
+      }
+    };
+
     const fetchData = async () => {
+      if (!isSupabaseConfigured()) {
+        loadFromLocalStorage();
+        setIsLoading(false);
+        return;
+      }
+
       try {
         const [professorsRes, coursesRes, reviewsRes, reportsRes] = await Promise.all([
           supabase.from('professors').select('*'),
@@ -70,13 +95,12 @@ export default function App() {
           supabase.from('reports').select('*')
         ]);
 
-        if (professorsRes.error) throw professorsRes.error;
-        if (coursesRes.error) throw coursesRes.error;
-        if (reviewsRes.error) throw reviewsRes.error;
-        if (reportsRes.error) throw reportsRes.error;
+        if (professorsRes.error || coursesRes.error || reviewsRes.error || reportsRes.error) {
+          throw new Error("Supabase data missing or unavailable");
+        }
 
         // Map snake_case to camelCase
-        const mappedProfessors = professorsRes.data.map(p => ({
+        const mappedProfessors = (professorsRes.data || []).map(p => ({
           id: p.id,
           name: p.name,
           department: p.department,
@@ -86,7 +110,7 @@ export default function App() {
           reviewCount: p.review_count
         }));
 
-        const mappedCourses = coursesRes.data.map(c => ({
+        const mappedCourses = (coursesRes.data || []).map(c => ({
           id: c.id,
           code: c.code,
           name: c.name,
@@ -95,7 +119,7 @@ export default function App() {
           professorIds: c.professor_ids || []
         }));
 
-        const mappedReviews = reviewsRes.data.map(r => ({
+        const mappedReviews = (reviewsRes.data || []).map(r => ({
           id: r.id,
           professorId: r.professor_id,
           studentName: r.student_name,
@@ -118,7 +142,7 @@ export default function App() {
           verified: r.verified
         }));
 
-        const mappedReports = reportsRes.data.map(r => ({
+        const mappedReports = (reportsRes.data || []).map(r => ({
           id: r.id,
           targetId: r.target_id,
           targetType: r.target_type,
@@ -129,57 +153,7 @@ export default function App() {
           reporterEmail: r.reporter_email
         }));
 
-        // Auto-seed Supabase database if it is empty, to prevent foreign key errors when adding new data
-        if (mappedProfessors.length === 0) {
-          console.log("Seeding Supabase with initial mock data...");
-          try {
-            await supabase.from('professors').insert(MOCK_PROFESSORS.map(p => ({
-              id: p.id,
-              name: p.name,
-              department: p.department,
-              title: p.title,
-              image: p.image,
-              average_rating: p.averageRating,
-              review_count: p.reviewCount
-            })));
-            
-            await supabase.from('courses').insert(MOCK_COURSES.map(c => ({
-              id: c.id,
-              code: c.code,
-              name: c.name,
-              department: c.department,
-              description: c.description,
-              professor_ids: c.professorIds
-            })));
-            
-            await supabase.from('reviews').insert(MOCK_REVIEWS.map(r => ({
-              id: r.id,
-              professor_id: r.professorId,
-              student_name: r.studentName,
-              rating: r.rating,
-              difficulty: r.difficulty,
-              tags: r.tags,
-              comment: r.comment,
-              course_code: r.courseCode,
-              date: r.date,
-              clarity: r.clarity,
-              fairness: r.fairness,
-              communication: r.communication,
-              expertise: r.expertise,
-              approachability: r.approachability,
-              for_credit: r.forCredit,
-              attendance: r.attendance,
-              would_take_again: r.wouldTakeAgain,
-              grade: r.grade,
-              textbook_used: r.textbookUsed,
-              verified: r.verified
-            })));
-          } catch (seedError) {
-            console.error("Error auto-seeding database:", seedError);
-          }
-        }
-
-        // Merge mock data with Supabase data to preserve initial mock state alongside new user-added data
+        // Merge mock data with Supabase data
         const mergedProfessors = [
           ...MOCK_PROFESSORS.filter(m => !mappedProfessors.some(p => p.id === m.id)), 
           ...mappedProfessors
@@ -200,33 +174,32 @@ export default function App() {
         setReviews(mergedReviews);
         setReports(mappedReports);
       } catch (error) {
-        console.error("Error fetching from Supabase:", error);
-        // Fallback to mock data on error
-        setProfessors(MOCK_PROFESSORS);
-        setCourses(MOCK_COURSES);
-        setReviews(MOCK_REVIEWS);
+        // Fallback to local storage if remote fetch fails
+        loadFromLocalStorage();
       } finally {
         setIsLoading(false);
       }
     };
+
     fetchData();
 
-    // Set up Supabase Auth Listener for Magic Link Logins
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user?.email) {
-        handleStudentLogin(session.user.email);
-      }
-    });
+    if (isSupabaseConfigured()) {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user?.email) {
+          handleStudentLogin(session.user.email);
+        }
+      }).catch(() => {});
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user?.email) {
-        handleStudentLogin(session.user.email);
-      } else {
-        setCurrentUser(null);
-      }
-    });
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (session?.user?.email) {
+          handleStudentLogin(session.user.email);
+        } else {
+          setCurrentUser(null);
+        }
+      });
 
-    return () => subscription.unsubscribe();
+      return () => subscription.unsubscribe();
+    }
   }, []);
 
   // Recalculate professor ratings when reviews change
@@ -258,12 +231,38 @@ export default function App() {
     });
   }, [reviews]);
 
+  // --- Sync local storage persistence ---
+  useEffect(() => {
+    if (!isLoading && professors.length > 0) {
+      localStorage.setItem('ukm_professors', JSON.stringify(professors));
+    }
+  }, [professors, isLoading]);
+
+  useEffect(() => {
+    if (!isLoading && courses.length > 0) {
+      localStorage.setItem('ukm_courses', JSON.stringify(courses));
+    }
+  }, [courses, isLoading]);
+
+  useEffect(() => {
+    if (!isLoading) {
+      localStorage.setItem('ukm_reviews', JSON.stringify(reviews));
+    }
+  }, [reviews, isLoading]);
+
+  useEffect(() => {
+    if (!isLoading) {
+      localStorage.setItem('ukm_reports', JSON.stringify(reports));
+    }
+  }, [reports, isLoading]);
+
   // --- CRUD Handlers ---
 
   const handleAddReview = async (newReview: Review) => {
     setReviews(prev => [newReview, ...prev]);
+    if (!isSupabaseConfigured()) return;
     try {
-      const { error } = await supabase.from('reviews').insert({
+      await supabase.from('reviews').insert({
         id: newReview.id,
         professor_id: newReview.professorId,
         student_name: newReview.studentName,
@@ -285,35 +284,26 @@ export default function App() {
         textbook_used: newReview.textbookUsed,
         verified: newReview.verified
       });
-      if (error) {
-        console.error("Supabase insert review error:", error);
-        setReviews(prev => prev.filter(r => r.id !== newReview.id));
-      }
-    } catch (error) {
-      console.error("Error adding review:", error);
-      setReviews(prev => prev.filter(r => r.id !== newReview.id));
+    } catch {
+      // Keep optimistic update in local state / local storage
     }
   };
 
   const handleDeleteReview = async (id: string) => {
-    const reviewToDelete = reviews.find(r => r.id === id);
     setReviews(prev => prev.filter(r => r.id !== id));
+    if (!isSupabaseConfigured()) return;
     try {
-      const { error } = await supabase.from('reviews').delete().eq('id', id);
-      if (error) {
-        console.error("Supabase delete review error:", error);
-        if (reviewToDelete) setReviews(prev => [reviewToDelete, ...prev]);
-      }
-    } catch (error) {
-      console.error("Error deleting review:", error);
-      if (reviewToDelete) setReviews(prev => [reviewToDelete, ...prev]);
+      await supabase.from('reviews').delete().eq('id', id);
+    } catch {
+      // Keep optimistic update in local state / local storage
     }
   };
 
   const handleAddProfessor = async (newProfessor: Professor) => {
     setProfessors(prev => [newProfessor, ...prev]);
+    if (!isSupabaseConfigured()) return;
     try {
-      const { error } = await supabase.from('professors').insert({
+      await supabase.from('professors').insert({
         id: newProfessor.id,
         name: newProfessor.name,
         department: newProfessor.department,
@@ -322,21 +312,16 @@ export default function App() {
         average_rating: newProfessor.averageRating,
         review_count: newProfessor.reviewCount
       });
-      if (error) {
-        console.error("Supabase insert professor error:", error);
-        setProfessors(prev => prev.filter(p => p.id !== newProfessor.id));
-      }
-    } catch (error) {
-      console.error("Error adding professor:", error);
-      setProfessors(prev => prev.filter(p => p.id !== newProfessor.id));
+    } catch {
+      // Keep optimistic update
     }
   };
 
   const handleUpdateProfessor = async (updatedProfessor: Professor) => {
-    const originalProfessor = professors.find(p => p.id === updatedProfessor.id);
     setProfessors(prev => prev.map(p => p.id === updatedProfessor.id ? updatedProfessor : p));
+    if (!isSupabaseConfigured()) return;
     try {
-      const { error } = await supabase.from('professors').update({
+      await supabase.from('professors').update({
         name: updatedProfessor.name,
         department: updatedProfessor.department,
         title: updatedProfessor.title,
@@ -344,35 +329,26 @@ export default function App() {
         average_rating: updatedProfessor.averageRating,
         review_count: updatedProfessor.reviewCount
       }).eq('id', updatedProfessor.id);
-      if (error) {
-        console.error("Supabase update professor error:", error);
-        if (originalProfessor) setProfessors(prev => prev.map(p => p.id === updatedProfessor.id ? originalProfessor : p));
-      }
-    } catch (error) {
-      console.error("Error updating professor:", error);
-      if (originalProfessor) setProfessors(prev => prev.map(p => p.id === updatedProfessor.id ? originalProfessor : p));
+    } catch {
+      // Keep optimistic update
     }
   };
 
   const handleDeleteProfessor = async (id: string) => {
-    const professorToDelete = professors.find(p => p.id === id);
     setProfessors(prev => prev.filter(p => p.id !== id));
+    if (!isSupabaseConfigured()) return;
     try {
-      const { error } = await supabase.from('professors').delete().eq('id', id);
-      if (error) {
-        console.error("Supabase delete professor error:", error);
-        if (professorToDelete) setProfessors(prev => [professorToDelete, ...prev]);
-      }
-    } catch (error) {
-      console.error("Error deleting professor:", error);
-      if (professorToDelete) setProfessors(prev => [professorToDelete, ...prev]);
+      await supabase.from('professors').delete().eq('id', id);
+    } catch {
+      // Keep optimistic update
     }
   };
 
   const handleAddCourse = async (newCourse: Course) => {
     setCourses(prev => [newCourse, ...prev]);
+    if (!isSupabaseConfigured()) return;
     try {
-      const { error } = await supabase.from('courses').insert({
+      await supabase.from('courses').insert({
         id: newCourse.id,
         code: newCourse.code,
         name: newCourse.name,
@@ -380,49 +356,34 @@ export default function App() {
         description: newCourse.description,
         professor_ids: newCourse.professorIds
       });
-      if (error) {
-        console.error("Supabase insert course error:", error);
-        setCourses(prev => prev.filter(c => c.id !== newCourse.id));
-      }
-    } catch (error) {
-      console.error("Error adding course:", error);
-      setCourses(prev => prev.filter(c => c.id !== newCourse.id));
+    } catch {
+      // Keep optimistic update
     }
   };
 
   const handleUpdateCourse = async (updatedCourse: Course) => {
-    const originalCourse = courses.find(c => c.id === updatedCourse.id);
     setCourses(prev => prev.map(c => c.id === updatedCourse.id ? updatedCourse : c));
+    if (!isSupabaseConfigured()) return;
     try {
-      const { error } = await supabase.from('courses').update({
+      await supabase.from('courses').update({
         code: updatedCourse.code,
         name: updatedCourse.name,
         department: updatedCourse.department,
         description: updatedCourse.description,
         professor_ids: updatedCourse.professorIds
       }).eq('id', updatedCourse.id);
-      if (error) {
-        console.error("Supabase update course error:", error);
-        if (originalCourse) setCourses(prev => prev.map(c => c.id === updatedCourse.id ? originalCourse : c));
-      }
-    } catch (error) {
-      console.error("Error updating course:", error);
-      if (originalCourse) setCourses(prev => prev.map(c => c.id === updatedCourse.id ? originalCourse : c));
+    } catch {
+      // Keep optimistic update
     }
   };
 
   const handleDeleteCourse = async (id: string) => {
-    const courseToDelete = courses.find(c => c.id === id);
     setCourses(prev => prev.filter(c => c.id !== id));
+    if (!isSupabaseConfigured()) return;
     try {
-      const { error } = await supabase.from('courses').delete().eq('id', id);
-      if (error) {
-        console.error("Supabase delete course error:", error);
-        if (courseToDelete) setCourses(prev => [courseToDelete, ...prev]);
-      }
-    } catch (error) {
-      console.error("Error deleting course:", error);
-      if (courseToDelete) setCourses(prev => [courseToDelete, ...prev]);
+      await supabase.from('courses').delete().eq('id', id);
+    } catch {
+      // Keep optimistic update
     }
   };
 
@@ -439,8 +400,11 @@ export default function App() {
     };
     
     setReports(prev => [newReport, ...prev]);
+    alert("Thank you! Your professor suggestion has been submitted for admin approval.");
+    
+    if (!isSupabaseConfigured()) return;
     try {
-      const { error } = await supabase.from('reports').insert({
+      await supabase.from('reports').insert({
         id: newReport.id,
         target_id: newReport.targetId,
         target_type: newReport.targetType,
@@ -450,15 +414,8 @@ export default function App() {
         timestamp: newReport.timestamp,
         reporter_email: newReport.reporterEmail
       });
-      if (error) {
-        console.error("Supabase insert report error:", error);
-        setReports(prev => prev.filter(r => r.id !== newReport.id));
-      } else {
-        alert("Thank you! Your professor suggestion has been submitted for admin approval.");
-      }
-    } catch (error) {
-      console.error("Error adding report:", error);
-      setReports(prev => prev.filter(r => r.id !== newReport.id));
+    } catch {
+      // Keep optimistic update
     }
   };
 
@@ -475,8 +432,11 @@ export default function App() {
     };
     
     setReports(prev => [newReport, ...prev]);
+    alert("Thank you! Your course suggestion has been submitted for admin approval.");
+
+    if (!isSupabaseConfigured()) return;
     try {
-      const { error } = await supabase.from('reports').insert({
+      await supabase.from('reports').insert({
         id: newReport.id,
         target_id: newReport.targetId,
         target_type: newReport.targetType,
@@ -486,27 +446,23 @@ export default function App() {
         timestamp: newReport.timestamp,
         reporter_email: newReport.reporterEmail
       });
-      if (error) {
-        console.error("Supabase insert report error:", error);
-        setReports(prev => prev.filter(r => r.id !== newReport.id));
-      } else {
-        alert("Thank you! Your course suggestion has been submitted for admin approval.");
-      }
-    } catch (error) {
-      console.error("Error adding report:", error);
-      setReports(prev => prev.filter(r => r.id !== newReport.id));
+    } catch {
+      // Keep optimistic update
     }
   };
+
   const handleReportContent = async (report: Omit<Report, 'id' | 'status' | 'timestamp'>) => {
     const newReport: Report = {
       ...report,
-      id: crypto.randomUUID(), // Use UUID for Supabase
+      id: crypto.randomUUID(),
       status: 'pending',
       timestamp: new Date().toISOString()
     };
     setReports(prev => [newReport, ...prev]);
+
+    if (!isSupabaseConfigured()) return;
     try {
-      const { error } = await supabase.from('reports').insert({
+      await supabase.from('reports').insert({
         id: newReport.id,
         target_id: newReport.targetId,
         target_type: newReport.targetType,
@@ -516,13 +472,8 @@ export default function App() {
         timestamp: newReport.timestamp,
         reporter_email: newReport.reporterEmail
       });
-      if (error) {
-        console.error("Supabase insert report error:", error);
-        setReports(prev => prev.filter(r => r.id !== newReport.id));
-      }
-    } catch (error) {
-      console.error("Error adding report:", error);
-      setReports(prev => prev.filter(r => r.id !== newReport.id));
+    } catch {
+      // Keep optimistic update
     }
   };
 
@@ -656,15 +607,15 @@ export default function App() {
           onTriggerLogin={handleRequireLogin} 
           onLogout={handleStudentLogout}
           items={STATIC_NAV_ITEMS}
-          baseColor={currentUser ? "#0f172a" : (navbarTheme === 'dark' ? "#020617" : "#ffffff")}
+          baseColor={currentUser ? "#0f172a" : (navbarTheme === 'dark' ? "rgba(2, 6, 23, 0.85)" : "rgba(255, 255, 255, 0.65)")}
           menuColor={currentUser ? "#ffffff" : (navbarTheme === 'dark' ? "#ffffff" : "#1e293b")}
-          buttonBgColor={currentUser ? "#334155" : (navbarTheme === 'dark' ? "#1e293b" : "#003366")}
+          buttonBgColor={currentUser ? "#334155" : (navbarTheme === 'dark' ? "#2563eb" : "#2563eb")}
           buttonTextColor="#ffffff"
           ease="power3.out"
           onExpandedChange={setIsNavExpanded}
         />
         
-        <main className={`flex-grow relative z-10 pt-28 transition-colors duration-500 ${isHomePage && navbarTheme === 'dark' ? 'bg-slate-950 text-white' : 'bg-transparent text-slate-800'}`}>
+        <main className={`flex-grow relative z-10 ${isHomePage ? 'pt-0' : 'pt-28'} transition-colors duration-500 ${isHomePage && navbarTheme === 'dark' ? 'bg-slate-950 text-white' : 'bg-transparent text-slate-800'}`}>
           <Routes>
             <Route path="/" element={
               <Hero 

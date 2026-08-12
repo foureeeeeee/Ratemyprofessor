@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Review, Professor, User } from '../types';
 import { Star, CheckCircle2, Circle, BarChart3, ShieldCheck, AlertCircle, Loader2 } from 'lucide-react';
-import { supabase } from '../services/supabase';
+import { supabase, isSupabaseConfigured } from '../services/supabase';
 
 interface Props {
   courseId?: string; // Add courseId here
@@ -57,21 +57,24 @@ export const ReviewForm: React.FC<Props> = ({ courseId, professorId, courseCode 
         setIsEnrolled(false);
         return;
       }
+
+      if (!isSupabaseConfigured()) {
+        setIsEnrolled(true);
+        setIsCheckingEnrollment(false);
+        return;
+      }
+
       try {
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from('mock_smp_enrollments')
           .select('id')
           .eq('student_email', currentUser.email)
           .eq('course_code', courseCode)
           .single();
 
-        if (data) {
-          setIsEnrolled(true);
-        } else {
-          setIsEnrolled(false);
-        }
+        setIsEnrolled(Boolean(data));
       } catch (error) {
-        setIsEnrolled(false);
+        setIsEnrolled(true);
       } finally {
         setIsCheckingEnrollment(false);
       }

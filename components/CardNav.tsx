@@ -56,7 +56,7 @@ export const CardNav: React.FC<CardNavProps> = ({
   const tlRef = useRef<gsap.core.Timeline | null>(null);
 
   // Detect dark base color for dynamic high-contrast UI theming
-  const isDarkBase = baseColor === '#0f172a' || baseColor === '#111827' || baseColor === '#003366' || baseColor === '#1e293b' || baseColor === '#020617';
+  const isDarkBase = baseColor === '#0f172a' || baseColor === '#111827' || baseColor === '#003366' || baseColor === '#1e293b' || baseColor === '#020617' || baseColor.includes('2, 6, 23') || baseColor.includes('15, 23, 42');
 
   const calculateHeight = () => {
     const navEl = navRef.current;
@@ -215,7 +215,17 @@ export const CardNav: React.FC<CardNavProps> = ({
 
   return (
     <div className={`card-nav-container ${className}`}>
-      <nav ref={navRef} className={`card-nav ${isExpanded ? 'open' : ''}`} style={{ backgroundColor: baseColor }}>
+      <nav 
+        ref={navRef} 
+        className={`card-nav ${isExpanded ? 'open' : ''}`} 
+        style={{ 
+          backgroundColor: baseColor,
+          borderColor: isDarkBase ? 'rgba(255, 255, 255, 0.12)' : 'rgba(255, 255, 255, 0.85)',
+          boxShadow: isDarkBase 
+            ? '0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5)' 
+            : '0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 0 20px rgba(255, 255, 255, 0.6)'
+        }}
+      >
         <div className="card-nav-top">
           <div
             className={`hamburger-menu ${isHamburgerOpen ? 'open' : ''}`}
